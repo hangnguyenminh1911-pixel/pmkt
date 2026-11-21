@@ -1,0 +1,32 @@
+# Thư viện cài bằng npm (cài lại bằng: npm install)
+node_modules/
+
+# Dữ liệu chạy thật (mật khẩu, khách hàng, chứng từ...) - không commit
+# Dữ liệu mẫu ban đầu nằm ở data-mau/
+data/
+data-backup/
+
+# Cấu hình bí mật
+.env
+.env.*
+!.env.example
+
+# Log
+logs/
+*.log
+npm-debug.log*
+
+# File tạm / sao lưu git
+*.bundle
+*.tmp
+
+# Thư mục làm việc của công cụ AI
+AI req/
+
+# Hệ điều hành & trình soạn thảo
+Thumbs.db
+desktop.ini
+.DS_Store
+.vscode/*
+!.vscode/settings.json
+.idea/

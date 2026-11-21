@@ -1,25 +1,32 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const { PORT } = require('./src/config/env'); // nạp .env trước tiên
+const { PUBLIC_DIR, DATA_DIR } = require('./src/config/paths');
+const { khoiTaoDuLieu } = require('./src/utils/khoiTaoDuLieu');
 const app = express();
-const PORT = 3000;
 
-const DATA_FILE = path.join(__dirname, 'data.json');
-const CUSTOMERS_FILE = path.join(__dirname, 'customers.json');
-const PRODUCTS_FILE = path.join(__dirname, 'products.json');
+// Tạo data/ và chép dữ liệu mẫu (data-mau/) cho các file còn thiếu - không ghi đè dữ liệu thật
+khoiTaoDuLieu();
+
+// Chứng từ dùng chung kho data/vouchers.json; khách hàng & hàng hóa dùng data/ (cùng file với src/services)
+const DATA_FILE = path.join(DATA_DIR, 'vouchers.json');
+const CUSTOMERS_FILE = path.join(DATA_DIR, 'customers.json');
+const PRODUCTS_FILE = path.join(DATA_DIR, 'products.json');
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(__dirname));
+// Chỉ phát thư mục public/ lên web (không lộ data/, src/, server.js, package.json...)
+app.use(express.static(PUBLIC_DIR));
 
 // --- TÍCH HỢP PHÂN HỆ AUTH ROUTER (Mục 3) ---
-const authRouter = require('./authRouter');
-const apiRouter = require('./apiRouter');
+const authRouter = require('./src/routes/authRouter');
+const apiRouter = require('./src/routes/apiRouter');
 app.use(authRouter);
 app.use(apiRouter);
 
 // --- TÍCH HỢP ADMINROUTER ---
-const adminRouter = require('./adminRouter'); // Đường dẫn đến file router trên
+const adminRouter = require('./src/routes/adminRouter'); // Đường dẫn đến file router trên
 app.use(adminRouter);
 
 // --- 1. XỬ LÝ CHỨNG TỪ (data.json) ---
@@ -330,6 +337,6 @@ app.post('/api/xoa-nhieu-hang-hoa', (req, res) => {
     res.json({ success: true, message: thongBao, daXoa, biChan });
 });
 
-app.listen(3000, () => {
-    console.log("Phần mềm kế toán đang chạy tại: http://localhost:3000/dashboard.html");
+app.listen(PORT, () => {
+    console.log(`Phần mềm kế toán đang chạy tại: http://localhost:${PORT}/dashboard.html`);
 });

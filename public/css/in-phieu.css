@@ -1,0 +1,80 @@
+/* 1. Ép font Times New Roman chuẩn hành chính và giãn dòng thoáng */
+#khung-giay-in-a4, #khung-giay-in-a4 * {
+    font-family: "Times New Roman", Times, serif !important;
+}
+#khung-giay-in-a4 {
+    line-height: 1.55 !important;
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}
+
+/* 2. Ép bảng luôn có viền outline đen và kẻ lưới từng ô (chống Tailwind xóa viền) */
+#khung-giay-in-a4 table.print-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+    border: 1px solid #000000 !important;
+    margin: 12px 0 !important;
+    font-size: 13px !important;
+}
+
+#khung-giay-in-a4 table.print-table th,
+#khung-giay-in-a4 table.print-table td {
+    border: 1px solid #000000 !important; /* Kẻ viền đen rõ ràng từng ô */
+    padding: 6px 8px !important;           /* Giãn cách chữ với viền cho đẹp mắt */
+    vertical-align: middle !important;
+    line-height: 1.4 !important;
+}
+
+#khung-giay-in-a4 table.print-table thead th {
+    background-color: #f2f2f2 !important;
+    font-weight: bold !important;
+    text-align: center !important;
+}
+
+/* 3. Bảng chữ ký phía dưới không kẻ viền */
+#khung-giay-in-a4 table.signature-table,
+#khung-giay-in-a4 table.signature-table td {
+    border: none !important;
+    padding: 0 !important;
+}
+
+/* 4. Định dạng khi bấm lệnh In trình duyệt (Window.print) */
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+    #modal-xem-in-phieu, #modal-xem-in-phieu * {
+        visibility: visible !important;
+    }
+    #modal-xem-in-phieu {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        background: transparent !important;
+        display: block !important;
+        z-index: 999999 !important;
+        padding: 0 !important;
+    }
+    #modal-xem-in-phieu > div {
+        max-width: 100% !important;
+        box-shadow: none !important;
+        border: none !important;
+    }
+    #modal-xem-in-phieu .shrink-0, 
+    #modal-xem-in-phieu .bg-orange-950,
+    #dropdown-menu-in {
+        display: none !important;
+    }
+    #khung-giay-in-a4 {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    @page {
+        size: A4 portrait;
+        margin: 12mm 15mm 15mm 15mm;
+    }
+}
