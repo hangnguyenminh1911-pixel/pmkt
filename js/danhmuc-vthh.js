@@ -131,6 +131,11 @@
             });
         }
 
+        // 6. Gọi từ ô "ĐVT chính" (oninput="capNhatMoTaQuyDoi()"): tính lại mô tả cho toàn bộ các dòng quy đổi
+        function capNhatMoTaQuyDoi() {
+            tuDongTinhMoTa(null);
+        }
+
         // Lắng nghe khi người dùng đổi ô "ĐVT chính" ở trên thì tự cập nhật lại cột mô tả của các dòng quy đổi
         document.getElementById('quick-dvt-hh')?.addEventListener('input', () => {
             tuDongTinhMoTa(null);

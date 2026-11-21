@@ -325,12 +325,75 @@ function renderSoDuTaiKhoanTien() {
     if (inputTM) {
         inputTM.value = Number(dataSoDu.tienMat || 0).toLocaleString('en-US');
     }
+
+    // Vẽ lại các dòng tiền gửi ngân hàng (1121) đã lưu
+    const tbodyNH = document.getElementById('tbody-sodu-nganhang');
+    if (tbodyNH) {
+        tbodyNH.innerHTML = "";
+        (Array.isArray(dataSoDu.nganHang) ? dataSoDu.nganHang : []).forEach(nh => themDongNganHang(nh));
+    }
+}
+
+// Thêm 1 dòng tài khoản ngân hàng vào bảng số dư Tiền gửi ngân hàng (1121)
+// duLieu (không bắt buộc): { soTaiKhoan, tenNganHang, soDu } khi nạp lại dữ liệu đã lưu
+function themDongNganHang(duLieu = null) {
+    const tbody = document.getElementById('tbody-sodu-nganhang');
+    if (!tbody) return;
+
+    const nh = duLieu || {};
+    const giaTriAnToan = (v) => String(v == null ? "" : v).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+
+    const tr = document.createElement('tr');
+    tr.className = "hover:bg-gray-50 sodu-nh-row";
+    tr.innerHTML = `
+        <td class="py-2 px-3 text-center text-gray-500 sodu-nh-stt"></td>
+        <td class="py-2 px-3">
+            <input type="text" value="${giaTriAnToan(nh.soTaiKhoan)}" placeholder="Số tài khoản..." class="w-full px-2 py-1 border rounded font-semibold text-orange-900 sodu-nh-sotk focus:outline-none focus:ring-1 focus:ring-orange-700 bg-white">
+        </td>
+        <td class="py-2 px-3">
+            <input type="text" value="${giaTriAnToan(nh.tenNganHang)}" placeholder="Ví dụ: Techcombank - CN Hải Phòng" class="w-full px-2 py-1 border rounded sodu-nh-ten focus:outline-none focus:ring-1 focus:ring-orange-700 bg-white">
+        </td>
+        <td class="py-2 px-3 text-right">
+            <input type="text" value="${Number(nh.soDu || 0).toLocaleString('en-US')}" onfocus="this.select()" oninput="formatNumberInput(this)" class="w-full px-2 py-1 border rounded text-right font-bold text-orange-900 sodu-nh-sodu focus:outline-none focus:ring-1 focus:ring-orange-700 bg-white">
+        </td>
+        <td class="py-2 px-3 text-center">
+            <button type="button" onclick="xoaDongNganHang(this)" class="text-red-500 hover:text-red-700 text-sm" title="Xóa dòng"><i class="fa-solid fa-trash-can"></i></button>
+        </td>
+    `;
+    tbody.appendChild(tr);
+    capNhatSTTNganHang();
+
+    // Thêm mới bằng nút bấm thì đưa con trỏ vào ô Số tài khoản
+    if (!duLieu) tr.querySelector('.sodu-nh-sotk')?.focus();
+}
+
+// Xóa 1 dòng tài khoản ngân hàng (chỉ trên giao diện, bấm "Lưu số dư" để ghi lên server)
+function xoaDongNganHang(btn) {
+    const row = btn.closest('tr');
+    if (row) row.remove();
+    capNhatSTTNganHang();
+}
+
+function capNhatSTTNganHang() {
+    document.querySelectorAll('#tbody-sodu-nganhang .sodu-nh-row').forEach((r, idx) => {
+        const cell = r.querySelector('.sodu-nh-stt');
+        if (cell) cell.textContent = idx + 1;
+    });
 }
 
 // Lưu số dư tài khoản tiền lên Server
 async function luuSoDuTaiKhoanTien() {
     const tienMat = parseFloat(document.getElementById('sodu-tienmat-vnd')?.value.replace(/,/g, '')) || 0;
-    const dataToSave = { tienMat, nganHang: [] };
+    // Gom các dòng tiền gửi ngân hàng (bỏ qua dòng trống hoàn toàn)
+    const nganHang = [];
+    document.querySelectorAll('#tbody-sodu-nganhang .sodu-nh-row').forEach(r => {
+        const soTaiKhoan = (r.querySelector('.sodu-nh-sotk')?.value || "").trim();
+        const tenNganHang = (r.querySelector('.sodu-nh-ten')?.value || "").trim();
+        const soDu = parseFloat((r.querySelector('.sodu-nh-sodu')?.value || "0").replace(/,/g, '')) || 0;
+        if (!soTaiKhoan && !tenNganHang && soDu === 0) return;
+        nganHang.push({ soTaiKhoan, tenNganHang, soDu });
+    });
+    const dataToSave = { tienMat, nganHang };
     
     try {
         const res = await fetch('/api/so-du/luu', {

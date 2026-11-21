@@ -29,7 +29,7 @@ function layDanhSachChungTu() {
 
 // 2. Lưu hoặc Cập nhật chứng từ (Phiếu bán hàng)
 function luuChungTu(payload) {
-    const { soChungTu, ngayChungTu, maDoiTuong, doiTuong, diaChi, dienGiai, ckHd, chiTiet, tongThanhToan } = payload;
+    const { soChungTu, ngayChungTu, maDoiTuong, doiTuong, diaChi, dienGiai, ckHd, chiTiet, tongThanhToan, loaiChungTu, nguoiNopNhan } = payload;
 
     if (!soChungTu || !ngayChungTu || !chiTiet || chiTiet.length === 0) {
         throw new Error("Thiếu thông tin bắt buộc của chứng từ!");
@@ -53,6 +53,13 @@ function luuChungTu(payload) {
         tongThanhToan: tongThanhToan || "0 đ",
         ngayCapNhat: new Date().toISOString()
     };
+
+    // Phiếu thu (PT), phiếu chi (PC), phiếu mua hàng (PN): lưu thêm loại chứng từ và người nộp/nhận.
+    // Phiếu bán hàng không gửi loaiChungTu nên dữ liệu lưu giữ nguyên như cũ.
+    if (loaiChungTu) {
+        chungTuMoi.loaiChungTu = String(loaiChungTu).trim().toUpperCase();
+        chungTuMoi.nguoiNopNhan = nguoiNopNhan || "";
+    }
 
     if (index !== -1) {
         // Cập nhật (Sửa phiếu cũ)

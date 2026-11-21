@@ -166,6 +166,8 @@
                     window.danhSachChungTuCache = ketQua.data || [];
                     // Hiển thị toàn bộ dữ liệu ban đầu ra bảng
                     hienThiDanhSachBanHang(window.danhSachChungTuCache);
+                    // Vẽ lại danh sách phiếu thu / phiếu chi / phiếu mua hàng (js/thuchi-muahang.js)
+                    if (typeof hienThiDanhSachChungTuKhac === 'function') hienThiDanhSachChungTuKhac();
                 }
             } catch (error) {
                 console.error("Lỗi tải danh sách:", error);
@@ -174,6 +176,8 @@
 
         // 2. Hàm vẽ/hiển thị danh sách phiếu ra bảng HTML
             function hienThiDanhSachBanHang(danhSach) {
+                // Chỉ hiển thị phiếu bán hàng (phiếu cũ không có loaiChungTu được coi là phiếu bán hàng)
+                danhSach = (danhSach || []).filter(laChungTuBanHang);
                 const tbody = document.getElementById('tbody-danh-sach-banhang') || document.querySelector('#view-phieu-banhang tbody');
                 if (!tbody) return;
                 tbody.innerHTML = "";
@@ -230,6 +234,12 @@
                 }
             }
 
+            // Phân biệt phiếu bán hàng với phiếu thu/chi/mua hàng dùng chung kho chứng từ
+            function laChungTuBanHang(item) {
+                const loai = (item && item.loaiChungTu ? String(item.loaiChungTu) : 'BH').toUpperCase();
+                return loai === 'BH';
+            }
+
             // BỔ SUNG 2 HÀM ĐIỀU KHIỂN SỰ KIỆN CHECKBOX CHỨNG TỪ
             function chonTatCaCT(masterChk) {
                 document.querySelectorAll('.chk-item-ct').forEach(chk => {
@@ -248,6 +258,37 @@
                     if (dsChon.length > 0) btn.classList.remove('hidden');
                     else btn.classList.add('hidden');
                 }
+            }
+
+            // Xóa các phiếu bán hàng đã tích chọn (gọi API xóa từng phiếu rồi tải lại danh sách)
+            async function xoaNhieuChungTu() {
+                const dsChon = Array.from(document.querySelectorAll('.chk-item-ct:checked')).map(c => c.value);
+                if (dsChon.length === 0) return;
+
+                if (!confirm(`Bạn có chắc chắn muốn xóa ${dsChon.length} chứng từ đã chọn không?\n\n${dsChon.join('\n')}`)) return;
+
+                let soThanhCong = 0;
+                const dsLoi = [];
+                for (const soCT of dsChon) {
+                    try {
+                        const res = await fetch(`/api/xoa-chung-tu/${encodeURIComponent(soCT)}`, { method: 'DELETE' });
+                        const result = await res.json();
+                        if (result.success) soThanhCong++;
+                        else dsLoi.push(`${soCT}: ${result.message || 'Lỗi không xác định'}`);
+                    } catch (e) {
+                        dsLoi.push(`${soCT}: Lỗi kết nối máy chủ`);
+                    }
+                }
+
+                let thongBao = `Đã xóa ${soThanhCong}/${dsChon.length} chứng từ.`;
+                if (dsLoi.length > 0) thongBao += `\n\nKhông xóa được:\n${dsLoi.join('\n')}`;
+                alert(thongBao);
+
+                // Tải lại danh sách và bỏ chọn
+                await taiDanhSachChungTu();
+                const master = document.getElementById('chk-all-ct');
+                if (master) master.checked = false;
+                capNhatNutXoaCT();
             }
 
         // 3. Hàm kích hoạt lọc dữ liệu khi bấm nút "Lọc" hoặc gõ Enter
