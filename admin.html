@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cổng Quản Trị Nhà Cung Cấp - Bizmate SaaS</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR QUẢN TRỊ -->
+        <div class="w-72 bg-zinc-900 text-white flex flex-col shadow-xl">
+            <div class="p-5 text-base font-bold tracking-wider border-b border-white/10 flex items-center space-x-2">
+                <i class="fa-solid fa-shield-halved text-amber-400 text-lg"></i>
+                <span class="text-white">BIZMATE SUPER ADMIN</span>
+            </div>
+
+            <nav class="flex-1 px-3 py-4 space-y-1 text-sm">
+                <a href="#" onclick="chuyenTabAdmin('khachhang')" id="nav-khachhang" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg bg-white/10 text-white font-medium transition shadow-sm">
+                    <i class="fa-solid fa-users-gear w-5 text-center text-amber-400"></i>
+                    <span>Quản lý Khách hàng</span>
+                    <span id="badge-count" class="ml-auto bg-red-600 text-white text-xs px-2 py-0.5 rounded-full font-bold">0</span>
+                </a>
+                <a href="#" onclick="chuyenTabAdmin('goicuoc')" id="nav-goicuoc" class="flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-white/75 hover:bg-white/5 hover:text-white transition font-medium">
+                    <i class="fa-solid fa-tags w-5 text-center text-amber-400"></i>
+                    <span>Quản lý Gói cước</span>
+                </a>
+            </nav>
+
+            <div class="p-3 border-t border-white/10">
+                <a href="index.html" class="flex items-center space-x-3 px-4 py-2 rounded-lg text-red-300 hover:bg-red-600 hover:text-white transition text-sm">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Thoát trang quản trị</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- MAIN CONTENT AREA -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <header class="bg-white shadow-sm h-16 flex items-center justify-between px-8">
+                <h1 id="admin-page-title" class="text-xl font-bold text-gray-800">Quản lý Khách hàng & Cấp tài khoản</h1>
+                <div class="flex items-center space-x-3">
+                    <span class="text-sm text-gray-600">Quản trị viên: <b>Super Admin</b></span>
+                    <div class="w-9 h-9 rounded-full bg-amber-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">SA</div>
+                </div>
+            </header>
+
+            <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-8">
+                
+                <!-- TAB 1: QUẢN LÝ KHÁCH HÀNG -->
+                <div id="tab-content-khachhang" class="space-y-4">
+                    <div class="bg-white p-4 rounded-xl shadow-sm border flex justify-between items-center flex-wrap gap-3">
+                        <div class="flex items-center space-x-2 flex-wrap gap-2">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-400">
+                                    <i class="fa-solid fa-search text-xs"></i>
+                                </span>
+                                <input type="text" id="search-input" oninput="hienThiDanhSachKhachHang()" placeholder="Tìm theo tên, người liên hệ hoặc MST..." class="pl-9 pr-3.5 py-2 border rounded-lg text-sm w-72 focus:outline-none focus:ring-2 focus:ring-amber-600">
+                            </div>
+
+                            <select id="filter-trangthai" onchange="hienThiDanhSachKhachHang()" class="px-3 py-2 border rounded-lg text-sm bg-white font-medium focus:outline-none focus:ring-2 focus:ring-amber-600">
+                                <option value="Tất cả">Tất cả trạng thái</option>
+                                <option value="Chờ kích hoạt">Chờ kích hoạt</option>
+                                <option value="Đang hoạt động">Đang hoạt động</option>
+                            </select>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <button onclick="moModalTaoKhachHang()" class="bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-800 transition shadow-sm">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Thêm khách hàng mới
+                            </button>
+                            <span class="text-xs text-gray-500 font-medium">
+                                Tổng số: <span id="lbl-tong-kh" class="font-bold text-amber-800 text-sm">0</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="py-3.5 px-4 text-center w-12">STT</th>
+                                    <th class="py-3.5 px-4">Ngày đăng ký</th>
+                                    <th class="py-3.5 px-4">Tên đơn vị / Hộ KD</th>
+                                    <th class="py-3.5 px-4">Mã số thuế</th>
+                                    <th class="py-3.5 px-4">Người liên hệ</th>
+                                    <th class="py-3.5 px-4">Số điện thoại</th>
+                                    <th class="py-3.5 px-4">Email nhận thông tin</th>
+                                    <th class="py-3.5 px-4">Gói dịch vụ</th>
+                                    <th class="py-3.5 px-4 text-center">Trạng thái</th>
+                                    <th class="py-3.5 px-4 text-center w-44">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-khachhang-tonghop" class="divide-y divide-gray-200 text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TAB 2: QUẢN LÝ GÓI CƯỚC -->
+                <div id="tab-content-goicuoc" class="hidden space-y-4">
+                    <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border gap-3 flex-wrap">
+                        <div class="flex items-center space-x-3">
+                            <button onclick="moModalTaoGói()" class="bg-amber-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-amber-800 transition shadow-sm">
+                                <i class="fa-solid fa-plus mr-1.5"></i> Tạo gói cước mới
+                            </button>
+                            <div class="flex items-center space-x-2">
+                                <label class="text-xs font-semibold text-gray-600">Lọc nhóm:</label>
+                                <select id="filter-nhom" onchange="hienThiDanhSachGoiCuoc()" class="px-3 py-2 border rounded-lg text-sm bg-white font-medium focus:outline-none focus:ring-2 focus:ring-amber-600">
+                                    <option value="Tất cả">Tất cả nhóm</option>
+                                    <option value="Doanh nghiệp">Doanh nghiệp</option>
+                                    <option value="Hộ kinh doanh">Hộ kinh doanh</option>
+                                    <option value="Khác">Khác</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gray-500 font-medium">
+                            Tổng số gói cước: <span id="lbl-tong-goi" class="font-bold text-amber-800 text-sm">0</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border rounded-xl shadow-sm overflow-hidden">
+                        <table class="w-full text-left border-collapse text-sm">
+                            <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="py-3.5 px-4 text-center w-12">STT</th>
+                                    <th class="py-3.5 px-4">Tên Gói Cước</th>
+                                    <th class="py-3.5 px-4">Nhóm</th>
+                                    <th class="py-3.5 px-4">Thời hạn</th>
+                                    <th class="py-3.5 px-4">Giá cước (VNĐ)</th>
+                                    <th class="py-3.5 px-4">Mô tả chi tiết</th>
+                                    <th class="py-3.5 px-4 text-center">Trạng thái</th>
+                                    <th class="py-3.5 px-4 text-center w-40">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-goicuoc" class="divide-y divide-gray-200 text-gray-700"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+
+    <!-- MODAL THÊM / SỬA / CẤP TÀI KHOẢN KHÁCH HÀNG -->
+    <div id="modal-khachhang" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-xl overflow-hidden border">
+            <div class="bg-zinc-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modal-kh-title" class="font-bold text-sm flex items-center"><i class="fa-solid fa-user-pen mr-2 text-amber-400"></i> Cấu hình & Cấp tài khoản</h3>
+                <button onclick="dongModalKhachHang()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-6 space-y-4 text-xs text-gray-700">
+                <input type="hidden" id="kh-index" value="-1">
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Họ và tên người liên hệ *:</label>
+                        <input type="text" id="kh-hoten" placeholder="Nhập họ và tên..." class="w-full px-3.5 py-2 border rounded-lg text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Số điện thoại *:</label>
+                        <input type="text" id="kh-sdt" placeholder="Nhập số điện thoại..." class="w-full px-3.5 py-2 border rounded-lg text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Email nhận thông tin *:</label>
+                    <input type="email" id="kh-email" placeholder="nhapemail@domain.com..." class="w-full px-3.5 py-2 border rounded-lg text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Mã số thuế *:</label>
+                        <input type="text" id="kh-mst" placeholder="Nhập mã số thuế..." class="w-full px-3.5 py-2 border rounded-lg font-mono font-bold text-amber-900 text-sm">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Tên đơn vị / Hộ kinh doanh *:</label>
+                        <input type="text" id="kh-tendn" placeholder="Tên công ty hoặc hộ kinh doanh..." class="w-full px-3.5 py-2 border rounded-lg font-bold text-gray-800 text-sm">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Gói dịch vụ:</label>
+                        <select id="kh-goi" class="w-full px-3.5 py-2 border rounded-lg bg-white font-semibold text-amber-900 text-sm"></select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Trạng thái tài khoản:</label>
+                        <select id="kh-trangthai" class="w-full px-3.5 py-2 border rounded-lg bg-white font-semibold text-sm">
+                            <option value="Chờ kích hoạt">Chờ kích hoạt</option>
+                            <option value="Đang hoạt động">Đang hoạt động</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Mật khẩu khởi tạo / Đăng nhập:</label>
+                    <input type="text" id="kh-pass" placeholder="Tự động sinh ngẫu nhiên nếu để trống..." class="w-full px-3.5 py-2 border rounded-lg font-mono font-bold text-gray-800 text-sm">
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3.5 border-t flex justify-end space-x-2">
+                <button onclick="dongModalKhachHang()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-sm">Hủy</button>
+                <button onclick="luuKhachHang()" class="bg-amber-700 text-white px-5 py-2 rounded-lg font-medium text-sm hover:bg-amber-800 transition shadow-sm">
+                    <i class="fa-solid fa-save mr-1.5"></i> Lưu thông tin
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TẠO / SỬA GÓI CƯỚC -->
+    <div id="modal-goicuoc" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden border">
+            <div class="bg-zinc-900 text-white px-6 py-4 flex justify-between items-center">
+                <h3 id="modal-goi-title" class="font-bold text-sm flex items-center"><i class="fa-solid fa-tag mr-2 text-amber-400"></i> Tạo Gói Cước Mới</h3>
+                <button onclick="dongModalGoiCuoc()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+            </div>
+            
+            <div class="p-6 space-y-4 text-xs text-gray-700">
+                <input type="hidden" id="goi-index" value="-1">
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Tên gói cước:</label>
+                    <input type="text" id="goi-ten" placeholder="Ví dụ: Gói Hộ kinh doanh (1 Năm)" class="w-full px-3.5 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-600 text-sm font-semibold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Nhóm:</label>
+                        <select id="goi-nhom" class="w-full px-3.5 py-2 border rounded-lg bg-white text-sm font-semibold text-amber-900">
+                            <option value="Hộ kinh doanh">Hộ kinh doanh</option>
+                            <option value="Doanh nghiệp">Doanh nghiệp</option>
+                            <option value="Khác">Khác</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-800 mb-1">Thời hạn:</label>
+                        <select id="goi-thoihan" class="w-full px-3.5 py-2 border rounded-lg bg-white text-sm font-medium">
+                            <option value="1 Năm">1 Năm</option>
+                            <option value="2 Năm">2 Năm</option>
+                            <option value="3 Năm">3 Năm</option>
+                            <option value="Tháng">Linh hoạt (Tháng)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Giá cước (VNĐ):</label>
+                    <input type="text" id="goi-gia" oninput="dinhDangTienGoi(this)" placeholder="Ví dụ: 2,000,000" class="w-full px-3.5 py-2 border rounded-lg text-sm font-bold text-amber-900">
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Mô tả / Tính năng đi kèm:</label>
+                    <textarea id="goi-mota" rows="2" placeholder="Dành cho hộ kinh doanh nộp thuế khoán / kê khai theo TT88" class="w-full px-3.5 py-2 border rounded-lg text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-800 mb-1">Trạng thái phê duyệt:</label>
+                    <select id="goi-trangthai" class="w-full px-3.5 py-2 border rounded-lg bg-white text-sm font-semibold text-emerald-800">
+                        <option value="Hoạt động">Kích hoạt (Cho phép sử dụng)</option>
+                        <option value="Tạm khóa">Tạm khóa / Ẩn</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-6 py-3.5 border-t flex justify-end space-x-2">
+                <button onclick="dongModalGoiCuoc()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-sm">Hủy</button>
+                <button onclick="luuGoiCuoc()" class="bg-amber-700 text-white px-5 py-2 rounded-lg font-medium text-sm hover:bg-amber-800 transition shadow-sm">
+                    <i class="fa-solid fa-save mr-1.5"></i> Lưu gói cước
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let danhSachGoiCuoc = JSON.parse(localStorage.getItem('bizmate_goicuoc')) || [
+            { ten: "Gói Hộ kinh doanh (1 Năm)", nhom: "Hộ kinh doanh", thoiHan: "1 Năm", gia: "1,500,000", mota: "Dành cho hộ kinh doanh nộp thuế khoán / kê khai theo TT88", trangThai: "Hoạt động" },
+            { ten: "Gói Hộ kinh doanh (2 Năm)", nhom: "Hộ kinh doanh", thoiHan: "2 Năm", gia: "2,700,000", mota: "Tiết kiệm 10% khi đăng ký sử dụng 2 năm", trangThai: "Hoạt động" },
+            { ten: "Gói Doanh nghiệp SME (1 Năm)", nhom: "Doanh nghiệp", thoiHan: "1 Năm", gia: "3,000,000", mota: "Đầy đủ phân hệ kế toán cho doanh nghiệp vừa và nhỏ", trangThai: "Hoạt động" }
+        ];
+
+        let danhSachKhachHangTongHop = JSON.parse(localStorage.getItem('bizmate_khachhang')) || [
+            { ngayDangKy: "2026-11-04", hoTen: "Nguyễn Văn A", sdt: "0901234567", email: "hangnguyenminh1911@gmail.com", mst: "0200638946", tenDoanhNghiep: "Công ty TNHH Mẫu", goiCuoc: "Gói chuẩn", trangThai: "Chờ kích hoạt", password: "Bizmate@2026" }
+        ];
+
+        function luuLocalData() {
+            localStorage.setItem('bizmate_goicuoc', JSON.stringify(danhSachGoiCuoc));
+            localStorage.setItem('bizmate_khachhang', JSON.stringify(danhSachKhachHangTongHop));
+        }
+
+        function dinhDangTienGoi(input) {
+            let value = input.value.replace(/\D/g, '');
+            input.value = value ? Number(value).toLocaleString('en-US') : '';
+        }
+
+        function chuyenTabAdmin(tab) {
+            const tabKhachHang = document.getElementById('tab-content-khachhang');
+            const tabGoiCuoc = document.getElementById('tab-content-goicuoc');
+            const navKhachHang = document.getElementById('nav-khachhang');
+            const navGoiCuoc = document.getElementById('nav-goicuoc');
+            const pageTitle = document.getElementById('admin-page-title');
+
+            tabKhachHang.classList.add('hidden');
+            tabGoiCuoc.classList.add('hidden');
+            navKhachHang.className = "flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-white/75 hover:bg-white/5 hover:text-white transition font-medium";
+            navGoiCuoc.className = "flex items-center space-x-3 px-3.5 py-2.5 rounded-lg text-white/75 hover:bg-white/5 hover:text-white transition font-medium";
+
+            if (tab === 'khachhang') {
+                tabKhachHang.classList.remove('hidden');
+                navKhachHang.className = "flex items-center space-x-3 px-3.5 py-2.5 rounded-lg bg-white/10 text-white font-medium transition shadow-sm";
+                pageTitle.textContent = "Quản lý Khách hàng & Cấp tài khoản";
+                hienThiDanhSachKhachHang();
+            } else if (tab === 'goicuoc') {
+                tabGoiCuoc.classList.remove('hidden');
+                navGoiCuoc.className = "flex items-center space-x-3 px-3.5 py-2.5 rounded-lg bg-white/10 text-white font-medium transition shadow-sm";
+                pageTitle.textContent = "Quản lý Gói cước & Bảng giá";
+                hienThiDanhSachGoiCuoc();
+            }
+        }
+
+        async function taiDanhSachKhachHangTuServer() {
+    try {
+        // 1. Lấy danh sách khách hàng chính thức (users.json)
+        const resCustomers = await fetch('/api/admin/customers');
+        const resultCustomers = await resCustomers.json();
+        
+        // 2. Lấy danh sách yêu cầu đăng ký chờ duyệt (requests.json)
+        const resRequests = await fetch('/api/admin/requests');
+        const resultRequests = await resRequests.json();
+
+        let danhSachTong = [];
+
+        // Gộp dữ liệu khách hàng chính thức vào
+        if (resultCustomers.success && Array.isArray(resultCustomers.data)) {
+            danhSachTong = [...resultCustomers.data];
+        }
+
+        // Gộp cả các yêu cầu chờ duyệt vào danh sách tổng để hiển thị lên bảng quản trị
+        if (resultRequests.success && Array.isArray(resultRequests.data)) {
+            const dsChoDuyet = resultRequests.data.map(req => ({
+                // Đọc đúng các trường từ requests.json: ngayYeuCau, dienThoai, donVi, trangThai
+                ngayDangKy: req.ngayDangKy || req.ngayYeuCau || new Date().toISOString().split('T')[0],
+                hoTen: req.hoTen || 'Khách hàng',
+                
+                // Ánh xạ dienThoai sang sdt
+                sdt: req.sdt || req.dienThoai || '',
+                
+                email: req.email || '',
+                mst: req.mst || '',
+                
+                // Ánh xạ quan trọng: Lấy trường "donVi" từ file JSON gán vào tenDoanhNghiep
+                tenDoanhNghiep: req.tenDoanhNghiep || req.donVi || 'Chưa cập nhật',
+                
+                goiCuoc: req.goiCuoc || 'Gói chuẩn',
+                
+                // Đổi trạng thái từ "cho_duyet" sang "Chờ kích hoạt" để khớp với bộ lọc giao diện
+                trangThai: (req.trangThai === 'cho_duyet' || req.trangThai === 'Chờ kích hoạt') ? 'Chờ kích hoạt' : req.trangThai,
+                
+                password: req.password || 'Bizmate@2026'
+            }));
+
+            danhSachTong = [...dsChoDuyet, ...danhSachTong];
+        }
+
+        danhSachKhachHangTongHop = danhSachTong;
+        hienThiDanhSachKhachHang(); // Vẽ lại bảng dữ liệu trên giao diện
+
+    } catch (e) {
+        console.error("Lỗi kết nối API lấy danh sách:", e);
+    }
+}
+
+function hienThiDanhSachKhachHang() {
+    const keyword = document.getElementById('search-input').value.toLowerCase().trim();
+    const filterTrangThai = document.getElementById('filter-trangthai').value;
+
+    let ds = danhSachKhachHangTongHop.filter(item => {
+        const matchKeyword = (item.tenDoanhNghiep || '').toLowerCase().includes(keyword) || 
+                             (item.mst || '').toLowerCase().includes(keyword) || 
+                             (item.hoTen || '').toLowerCase().includes(keyword);
+        const matchTrangThai = (filterTrangThai === 'Tất cả' || item.trangThai === filterTrangThai);
+        return matchKeyword && matchTrangThai;
+    });
+
+    const soLuongCho = danhSachKhachHangTongHop.filter(i => i.trangThai === 'Chờ kích hoạt').length;
+    document.getElementById('badge-count').textContent = soLuongCho;
+    document.getElementById('lbl-tong-kh').textContent = ds.length;
+
+    const tbody = document.getElementById('tbody-khachhang-tonghop');
+    tbody.innerHTML = "";
+
+    if (ds.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-gray-400 italic">Không tìm thấy khách hàng nào phù hợp.</td></tr>`;
+        return;
+    }
+
+    ds.forEach((item, idx) => {
+        const realIndex = danhSachKhachHangTongHop.indexOf(item);
+        const isChoDuyet = item.trangThai === 'Chờ kích hoạt';
+        const isDangHoatDong = item.trangThai === 'Đang hoạt động';
+        
+        // 1. Xác định nhãn hiển thị cho cột TRẠNG THÁI
+        let badgeTrangThai = '<span class="bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full text-xs font-bold">Chờ kích hoạt</span>';
+        if (isDangHoatDong) {
+            badgeTrangThai = '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-xs font-bold">Đang hoạt động</span>';
+        } else if (item.trangThai === 'Đã khóa' || item.trangThai === 'Tạm khóa') {
+            badgeTrangThai = '<span class="bg-red-100 text-red-800 px-2.5 py-1 rounded-full text-xs font-bold">Đã khóa</span>';
+        }
+
+        // 2. Gom các nút THAO TÁC nằm gọn gàng trên một hàng ngang (dùng flex space-x-1.5 hoặc space-x-2)
+        let actionBtn = '';
+        if (isChoDuyet) {
+            actionBtn = `
+                <div class="flex items-center justify-center space-x-1.5 whitespace-nowrap">
+                    <button onclick="capTaiKhoan(${realIndex})" class="bg-emerald-700 hover:bg-emerald-800 text-white px-2.5 py-1.5 rounded-lg text-xs font-medium transition shadow-xs flex items-center" title="Cấp tài khoản">
+                        <i class="fa-solid fa-key mr-1"></i> Cấp TK
+                    </button>
+                    <button onclick="suaKhachHang(${realIndex})" class="text-blue-600 hover:text-blue-800 font-medium text-xs px-1" title="Sửa thông tin">
+                        <i class="fa-solid fa-pen-to-square text-[13px]"></i> Sửa
+                    </button>
+                    <button onclick="khoaTaiKhoan(${realIndex})" class="text-amber-600 hover:text-amber-800 font-medium text-xs px-1" title="Khóa tài khoản">
+                        <i class="fa-solid fa-lock text-[13px]"></i>
+                    </button>
+                    <button onclick="xoaKhachHang(${realIndex})" class="text-red-600 hover:text-red-800 font-medium text-xs px-1" title="Xóa khách hàng">
+                        <i class="fa-solid fa-trash text-[13px]"></i>
+                    </button>
+                </div>
+            `;
+        } else if (isDangHoatDong) {
+            actionBtn = `
+                <div class="flex items-center justify-center space-x-2 whitespace-nowrap">
+                    <button onclick="suaKhachHang(${realIndex})" class="text-blue-600 hover:text-blue-800 font-medium text-xs px-1" title="Sửa thông tin">
+                        <i class="fa-solid fa-pen-to-square text-[13px] mr-1"></i> Sửa
+                    </button>
+                    <button onclick="khoaTaiKhoan(${realIndex})" class="text-amber-600 hover:text-amber-800 font-medium text-xs px-1" title="Khóa tài khoản">
+                        <i class="fa-solid fa-lock text-[13px] mr-1"></i> Khóa
+                    </button>
+                    <button onclick="xoaKhachHang(${realIndex})" class="text-red-600 hover:text-red-800 font-medium text-xs px-1" title="Xóa khách hàng">
+                        <i class="fa-solid fa-trash text-[13px]"></i>
+                    </button>
+                </div>
+            `;
+        } else {
+            // Trường hợp tài khoản đã bị khóa -> Hiển thị nút Mở khóa, Sửa, Xóa
+            actionBtn = `
+                <div class="flex items-center justify-center space-x-2 whitespace-nowrap">
+                    <button onclick="moKhoaTaiKhoan(${realIndex})" class="text-emerald-600 hover:text-emerald-800 font-medium text-xs px-1" title="Mở khóa tài khoản">
+                        <i class="fa-solid fa-unlock text-[13px] mr-1"></i> Mở
+                    </button>
+                    <button onclick="suaKhachHang(${realIndex})" class="text-blue-600 hover:text-blue-800 font-medium text-xs px-1" title="Sửa thông tin">
+                        <i class="fa-solid fa-pen-to-square text-[13px]"></i> Sửa
+                    </button>
+                    <button onclick="xoaKhachHang(${realIndex})" class="text-red-600 hover:text-red-800 font-medium text-xs px-1" title="Xóa khách hàng">
+                        <i class="fa-solid fa-trash text-[13px]"></i>
+                    </button>
+                </div>
+            `;
+        }
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-gray-50";
+        tr.innerHTML = `
+            <td class="py-3 px-4 text-center text-gray-500">${idx + 1}</td>
+            <td class="py-3 px-4 text-gray-600">${item.ngayDangKy || 'Hôm nay'}</td>
+            <td class="py-3 px-4 font-bold text-gray-800">${item.tenDoanhNghiep || item.tenDonVi || item.ten || '-'}</td>
+            <td class="py-3 px-4 font-mono font-bold text-amber-900">${item.mst || '-'}</td>
+            <td class="py-3 px-4 text-gray-700">${item.hoTen || '-'}</td>
+            <td class="py-3 px-4 text-gray-700">${item.sdt || item.dienThoai || '-'}</td>
+            <td class="py-3 px-4 text-blue-600 font-medium">${item.email || '-'}</td>
+            <td class="py-3 px-4"><span class="bg-blue-50 text-blue-800 px-2.5 py-1 rounded-full text-xs font-medium">${item.goiCuoc || 'Gói chuẩn'}</span></td>
+            
+            <!-- Cột Trạng thái -->
+            <td class="py-3 px-4 text-center">${badgeTrangThai}</td>
+            
+            <!-- Cột Thao tác (Đã được căn chỉnh cân đối, nằm ngang) -->
+            <td class="py-3 px-4 text-center">${actionBtn}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+        // Tính năng Cấp tài khoản trực tiếp nhanh chóng cho khách chờ duyệt
+        async function capTaiKhoan(realIndex) {
+    const item = danhSachKhachHangTongHop[realIndex];
+    console.log("==> Dữ liệu khách hàng đang chuẩn bị cấp TK:", item);
+    console.log("==> MST gửi lên:", item.mst);
+
+    try {
+        // Truyền chính xác thuộc tính mst của khách hàng làm requestId lên server
+        const res = await fetch('/api/admin/approve-request', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                requestId: item.mst, // Gửi Mã số thuế (ví dụ: '012345678')
+                goiCuoc: item.goiCuoc, 
+                password: item.password || 'Bizmate@2026' 
+            })
+        });
+
+        const result = await res.json();
+        if (result.success) {
+            alert(result.message); 
+            taiDanhSachKhachHangTuServer(); // Tải lại danh sách mới nhất từ server
+        } else {
+            alert(result.message || "Lỗi kích hoạt tài khoản!");
+        }
+    } catch (e) {
+        alert("Lỗi kết nối máy chủ khi thực hiện cấp tài khoản!");
+        console.error(e);
+    }
+}
+
+        function moModalTaoKhachHang() {
+            document.getElementById('modal-kh-title').innerHTML = `<i class="fa-solid fa-user-plus mr-2 text-amber-400"></i> Thêm Khách Hàng Mới`;
+            document.getElementById('kh-index').value = -1;
+            document.getElementById('kh-hoten').value = '';
+            document.getElementById('kh-sdt').value = '';
+            document.getElementById('kh-email').value = '';
+            document.getElementById('kh-mst').value = '';
+            document.getElementById('kh-tendn').value = '';
+            document.getElementById('kh-pass').value = 'Bizmate@2026';
+            document.getElementById('kh-trangthai').value = 'Đang hoạt động';
+            
+            capNhatDropdownGoiCước();
+            document.getElementById('modal-khachhang').classList.remove('hidden');
+        }
+
+        function suaKhachHang(idx) {
+            const item = danhSachKhachHangTongHop[idx];
+            document.getElementById('modal-kh-title').innerHTML = `<i class="fa-solid fa-user-pen mr-2 text-amber-400"></i> Sửa & Cập nhật Khách Hàng`;
+            document.getElementById('kh-index').value = idx;
+            document.getElementById('kh-hoten').value = item.hoTen || item.nguoiLienHe || '';
+            
+            // Hứng dữ liệu số điện thoại linh hoạt
+            document.getElementById('kh-sdt').value = item.sdt || item.dienThoai || item.phone || '';
+            
+            document.getElementById('kh-email').value = item.email || '';
+            document.getElementById('kh-mst').value = item.mst || item.maSoThue || '';
+            
+            // HỨNG DỮ LIỆU TÊN ĐƠN VỊ CHUẨN XÁC, TRÁNH BỊ DÍNH CHỮ
+            document.getElementById('kh-tendn').value = item.tenDoanhNghiep || item.tenDonVi || item.ten || '';
+            
+            document.getElementById('kh-pass').value = item.password && item.password !== 'Bizmate@2026' ? item.password : ('Bizmate@' + Math.floor(1000 + Math.random() * 9000));
+            document.getElementById('kh-trangthai').value = item.trangThai || 'Chờ kích hoạt';
+            
+            capNhatDropdownGoiCước();
+            if (item.goiCuoc || item.goiDangKy) {
+                document.getElementById('kh-goi').value = item.goiCuoc || item.goiDangKy;
+            }
+            document.getElementById('modal-khachhang').classList.remove('hidden');
+        }
+
+        function dongModalKhachHang() {
+            document.getElementById('modal-khachhang').classList.add('hidden');
+        }
+
+        async function luuKhachHang() {
+            const hoTen = document.getElementById('kh-hoten').value.trim();
+            const sdt = document.getElementById('kh-sdt').value.trim();
+            const email = document.getElementById('kh-email').value.trim();
+            const mst = document.getElementById('kh-mst').value.trim();
+            const tenDoanhNghiep = document.getElementById('kh-tendn').value.trim();
+            const goiCuoc = document.getElementById('kh-goi').value;
+            const password = document.getElementById('kh-pass').value.trim();
+            const trangThai = document.getElementById('kh-trangthai').value;
+            const idx = document.getElementById('kh-index').value;
+
+            // Lấy MST gốc nếu đang ở chế độ sửa
+            let originalMst = "";
+            if (idx !== "-1" && danhSachKhachHangTongHop[idx]) {
+                originalMst = danhSachKhachHangTongHop[idx].mst || "";
+            }
+
+            if (!hoTen || !email || !sdt || !mst || !tenDoanhNghiep) {
+                alert("Vui lòng điền đầy đủ tất cả các trường thông tin bắt buộc!");
+                return;
+            }
+
+            // Gửi kèm originalMst lên server
+            const khData = { hoTen, sdt, email, mst, tenDoanhNghiep, goiCuoc, password, trangThai, originalMst };
+
+            try {
+                const res = await fetch('/api/admin/save-customer', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(khData)
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    dongModalKhachHang();
+                    taiDanhSachKhachHangTuServer(); // Tải lại danh sách từ server
+                } else {
+                    alert(result.message || "Lỗi khi lưu thông tin khách hàng!");
+                }
+            } catch (e) {
+                alert("Lỗi kết nối máy chủ khi lưu khách hàng!");
+                console.error(e);
+            }
+        }
+
+        async function xoaKhachHang(idx) {
+    const item = danhSachKhachHangTongHop[idx];
+    const identifier = item.mst || item.tenDoanhNghiep;
+
+    if (!confirm(`Bạn có chắc muốn xóa khách hàng "${item.tenDoanhNghiep || item.hoTen}" (MST: ${item.mst || 'N/A'}) không?`)) {
+        return;
+    }
+
+    try {
+        // Gửi yêu cầu xóa xuống server thông qua Mã số thuế (MST)
+        const res = await fetch(`/api/admin/delete-customer/${encodeURIComponent(item.mst)}`, {
+            method: 'DELETE'
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            alert(result.message);
+            taiDanhSachKhachHangTuServer(); // Tải lại danh sách chuẩn từ server sau khi xóa
+        } else {
+            alert(result.message || "Lỗi khi xóa khách hàng!");
+        }
+    } catch (e) {
+        console.error("Lỗi kết nối:", e);
+        alert("Lỗi kết nối máy chủ khi thực hiện xóa!");
+    }
+}
+
+        function capNhatDropdownGoiCước() {
+            const selectGoi = document.getElementById('kh-goi');
+            selectGoi.innerHTML = "";
+            danhSachGoiCuoc.filter(g => g.trangThai === 'Hoạt động').forEach(g => {
+                const opt = document.createElement('option');
+                opt.value = g.ten;
+                opt.textContent = `${g.ten} - [${g.nhom}] (${g.gia} đ / ${g.thoiHan})`;
+                selectGoi.appendChild(opt);
+            });
+        }
+
+        // --- Quản lý Gói cước ---
+        function hienThiDanhSachGoiCuoc() {
+            const filterNhom = document.getElementById('filter-nhom').value;
+            const tbody = document.getElementById('tbody-goicuoc');
+            
+            let dsHienThi = danhSachGoiCuoc;
+            if (filterNhom !== 'Tất cả') {
+                dsHienThi = danhSachGoiCuoc.filter(g => g.nhom === filterNhom);
+            }
+
+            document.getElementById('lbl-tong-goi').textContent = dsHienThi.length;
+            tbody.innerHTML = "";
+
+            if (dsHienThi.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="py-8 text-center text-gray-400 italic">Không tìm thấy gói cước phù hợp.</td></tr>`;
+                return;
+            }
+
+            dsHienThi.forEach((goi, idx) => {
+                const badgeColor = goi.trangThai === 'Hoạt động' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-200 text-gray-700';
+                const nhomColor = goi.nhom === 'Doanh nghiệp' ? 'bg-purple-50 text-purple-700 border-purple-200' : (goi.nhom === 'Hộ kinh doanh' ? 'bg-blue-50 text-blue-700 border-blue-200' : 'bg-gray-50 text-gray-700 border-gray-200');
+                const realIndex = danhSachGoiCuoc.indexOf(goi);
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-gray-50";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 text-center text-gray-500">${idx + 1}</td>
+                    <td class="py-3 px-4 font-bold text-gray-800">${goi.ten}</td>
+                    <td class="py-3 px-4"><span class="${nhomColor} px-2.5 py-1 rounded-md text-xs font-semibold border">${goi.nhom || 'Hộ kinh doanh'}</span></td>
+                    <td class="py-3 px-4 font-medium text-blue-700">${goi.thoiHan}</td>
+                    <td class="py-3 px-4 font-mono font-bold text-amber-900">${goi.gia} đ</td>
+                    <td class="py-3 px-4 text-gray-600 text-xs">${goi.mota || '-'}</td>
+                    <td class="py-3 px-4 text-center"><span class="${badgeColor} px-2.5 py-1 rounded-full text-xs font-bold">${goi.trangThai}</span></td>
+                    <td class="py-3 px-4 text-center space-x-2">
+                        <button onclick="suaGoiCuoc(${realIndex})" class="text-blue-600 hover:text-blue-800 font-medium text-xs"><i class="fa-solid fa-pen-to-square"></i> Sửa</button>
+                        <button onclick="xoaGoiCuoc(${realIndex})" class="text-red-600 hover:text-red-800 font-medium text-xs"><i class="fa-solid fa-trash"></i> Xóa</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function moModalTaoGói() {
+            document.getElementById('modal-goi-title').innerHTML = `<i class="fa-solid fa-tag mr-2 text-amber-400"></i> Tạo Gói Cước Mới`;
+            document.getElementById('goi-index').value = -1;
+            document.getElementById('goi-ten').value = '';
+            document.getElementById('goi-nhom').value = 'Hộ kinh doanh';
+            document.getElementById('goi-thoihan').value = '1 Năm';
+            document.getElementById('goi-gia').value = '';
+            document.getElementById('goi-mota').value = '';
+            document.getElementById('goi-trangthai').value = 'Hoạt động';
+            document.getElementById('modal-goicuoc').classList.remove('hidden');
+        }
+
+        function suaGoiCuoc(idx) {
+            const goi = danhSachGoiCuoc[idx];
+            document.getElementById('modal-goi-title').innerHTML = `<i class="fa-solid fa-pen mr-2 text-amber-400"></i> Sửa Gói Cước`;
+            document.getElementById('goi-index').value = idx;
+            document.getElementById('goi-ten').value = goi.ten;
+            document.getElementById('goi-nhom').value = goi.nhom || 'Hộ kinh doanh';
+            document.getElementById('goi-thoihan').value = goi.thoiHan;
+            document.getElementById('goi-gia').value = goi.gia;
+            document.getElementById('goi-mota').value = goi.mota;
+            document.getElementById('goi-trangthai').value = goi.trangThai;
+            document.getElementById('modal-goicuoc').classList.remove('hidden');
+        }
+
+        function dongModalGoiCuoc() {
+            document.getElementById('modal-goicuoc').classList.add('hidden');
+        }
+
+        function luuGoiCuoc() {
+            const idx = parseInt(document.getElementById('goi-index').value);
+            const ten = document.getElementById('goi-ten').value.trim();
+            const nhom = document.getElementById('goi-nhom').value;
+            const thoiHan = document.getElementById('goi-thoihan').value;
+            const gia = document.getElementById('goi-gia').value.trim();
+            const mota = document.getElementById('goi-mota').value.trim();
+            const trangThai = document.getElementById('goi-trangthai').value;
+
+            if (!ten || !gia) {
+                alert("Vui lòng nhập đầy đủ tên gói và giá cước!");
+                return;
+            }
+
+            const goiData = { ten, nhom, thoiHan, gia, mota, trangThai };
+            if (idx === -1) {
+                danhSachGoiCuoc.push(goiData);
+            } else {
+                danhSachGoiCuoc[idx] = goiData;
+            }
+
+            luuLocalData();
+            dongModalGoiCuoc();
+            hienThiDanhSachGoiCuoc();
+            alert("Đã lưu thông tin gói cước thành công!");
+        }
+
+        function xoaGoiCuoc(idx) {
+            if (confirm(`Bạn có chắc muốn xóa gói cước "${danhSachGoiCuoc[idx].ten}" không?`)) {
+                danhSachGoiCuoc.splice(idx, 1);
+                luuLocalData();
+                hienThiDanhSachGoiCuoc();
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            taiDanhSachKhachHangTuServer(); // Gọi API lấy dữ liệu thực tế thay vì localStorage
+        });
+        // Hàm khóa tài khoản khách hàng
+async function khoaTaiKhoan(idx) {
+    const item = danhSachKhachHangTongHop[idx];
+    if (!confirm(`Bạn có chắc chắn muốn khóa tài khoản của đơn vị "${item.tenDoanhNghiep || item.mst}" không?`)) {
+        return;
+    }
+
+    // Cập nhật trạng thái thành "Đã khóa"
+    item.trangThai = "Đã khóa";
+
+    try {
+        // Gửi thông tin cập nhật xuống server để lưu vào users.json
+        const res = await fetch('/api/admin/save-customer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            alert("Đã khóa tài khoản thành công!");
+            taiDanhSachKhachHangTuServer(); // Tải lại danh sách mới nhất từ server
+        } else {
+            alert(result.message || "Lỗi khi khóa tài khoản!");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Lỗi kết nối máy chủ khi khóa tài khoản!");
+    }
+}
+
+// Hàm mở khóa tài khoản khách hàng
+async function moKhoaTaiKhoan(idx) {
+    const item = danhSachKhachHangTongHop[idx];
+    item.trangThai = "Đang hoạt động";
+
+    try {
+        const res = await fetch('/api/admin/save-customer', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(item)
+        });
+        const result = await res.json();
+
+        if (result.success) {
+            alert("Đã mở khóa tài khoản thành công!");
+            taiDanhSachKhachHangTuServer();
+        } else {
+            alert(result.message || "Lỗi khi mở khóa tài khoản!");
+        }
+    } catch (e) {
+        console.error(e);
+        alert("Lỗi kết nối máy chủ!");
+    }
+}
+    </script>
+</body>
+</html>

@@ -1,0 +1,333 @@
+[
+  {
+    "ma": "SP001",
+    "ten": "Tôm viên JJ SCC 500g",
+    "dvt": "Túi",
+    "ton": 25,
+    "giaBan": 60000,
+    "giaVon": 45000,
+    "tinhChat": "nguyenvatlieu",
+    "tkKho": "152",
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "SP002",
+    "ten": "Bò viên JJ SCC 500g",
+    "dvt": "Túi",
+    "ton": 18,
+    "giaBan": 65000,
+    "giaVon": 48000,
+    "tinhChat": "hanghoa",
+    "tkKho": "156"
+  },
+  {
+    "ma": "HHC01",
+    "ten": "Hàng hóa A",
+    "dvt": "Cái",
+    "ton": 10,
+    "giaBan": 300000,
+    "giaVon": 200000,
+    "tinhChat": "hanghoa",
+    "tkKho": "152",
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "SUACHUA",
+    "ten": "Sữa chua",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Hộp",
+    "ton": 0,
+    "giaBan": 0,
+    "giaVon": 0,
+    "quyDoi": {
+      "dvtQuyDoi": "Vỉ",
+      "tyLeQuyDoi": 4,
+      "phepTinhQuyDoi": "nhan",
+      "moTaQuyDoi": "1 Vỉ = 4 Hộp"
+    },
+    "donViChuyenDoi": [
+      {
+        "dvtQD": "Vỉ",
+        "tyLe": 4,
+        "phepTinh": "nhan",
+        "moTa": "1 Vỉ = 4 Hộp"
+      }
+    ]
+  },
+  {
+    "ma": "BMHOACUC",
+    "ten": "Bánh mì hoa cúc",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Gói",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "MIHAOHAO",
+    "ten": "Mì hảo hảo",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Gói",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH01",
+    "ten": "HH01",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH02",
+    "ten": "HH02",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH03",
+    "ten": "HH03",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH04",
+    "ten": "HH04",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH05",
+    "ten": "HH05",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH06",
+    "ten": "HH06",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH07",
+    "ten": "HH07",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH08",
+    "ten": "HH08",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH09",
+    "ten": "HH09",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH10",
+    "ten": "HH10",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH14",
+    "ten": "HH14",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Hộp",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH15",
+    "ten": "HH15",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Gói",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH16",
+    "ten": "HH16",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Gói",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH17",
+    "ten": "HH17",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH18",
+    "ten": "HH18",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH19",
+    "ten": "HH19",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH20",
+    "ten": "HH20",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH21",
+    "ten": "HH21",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH22",
+    "ten": "HH22",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH23",
+    "ten": "HH23",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH24",
+    "ten": "HH24",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH25",
+    "ten": "HH25",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  },
+  {
+    "ma": "HH26",
+    "ten": "HH26",
+    "tinhChat": "hanghoa",
+    "tkKho": "156",
+    "dvt": "Cái",
+    "ton": 0,
+    "giaVon": 0,
+    "giaBan": 0,
+    "donViChuyenDoi": []
+  }
+]

@@ -1,0 +1,8 @@
+[
+  { "soHieu": "1111", "tenTaiKhoan": "Tiền mặt Việt Nam", "cap": 2, "tinhChat": "DuNo" },
+  { "soHieu": "1121", "tenTaiKhoan": "Tiền gửi ngân hàng không kỳ hạn", "cap": 2, "tinhChat": "DuNo" },
+  { "soHieu": "131", "tenTaiKhoan": "Phải thu của khách hàng", "cap": 1, "tinhChat": "LuongTinh" },
+  { "soHieu": "331", "tenTaiKhoan": "Phải trả cho người bán", "cap": 1, "tinhChat": "LuongTinh" },
+  { "soHieu": "156", "tenTaiKhoan": "Hàng hóa", "cap": 1, "tinhChat": "DuNo" },
+  { "soHieu": "5111", "tenTaiKhoan": "Doanh thu bán hàng hóa", "cap": 2, "tinhChat": "DuCo" }
+]

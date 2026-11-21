@@ -1,0 +1,29 @@
+[
+  {
+    "soChungTu": "BH 11/2026-0001",
+    "ngayChungTu": "2026-11-03",
+    "maDoiTuong": "KH001",
+    "doiTuong": "Công ty TNHH xây dựng và thương mại Trường Linh",
+    "diaChi": "Số 27 ngõ 159 phố Đông Các, phường ô chợ dừa, Phường Đống Đa, TP Hà Nội",
+    "dienGiai": "a",
+    "ckHd": "",
+    "chiTiet": [
+      {
+        "stt": 1,
+        "maHang": "SP001",
+        "tenHang": "Tôm viên JJ SCC 500g",
+        "dvt": "Túi",
+        "soLuong": 1,
+        "donGia": 60000,
+        "pctCK": "0",
+        "tienCK": 0,
+        "thueSuat": "0.08",
+        "thanhTien": "60,000",
+        "tienThue": "4,800",
+        "tongThanhToan": "64,800"
+      }
+    ],
+    "tongThanhToan": "64.800 đ",
+    "ngayCapNhat": "2026-11-03T10:28:41.486Z"
+  }
+]

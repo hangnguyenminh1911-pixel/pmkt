@@ -1,0 +1,14 @@
+[
+    {
+        "stk": "19030000123456",
+        "tenNganHang": "Techcombank",
+        "chiNhanh": "Chi nhánh Hải Phòng",
+        "tkKeToan": "1121"
+    },
+    {
+        "stk": "0123456",
+        "tenNganHang": "Vietinbank",
+        "chiNhanh": "",
+        "tkKeToan": "1121"
+    }
+]

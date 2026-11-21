@@ -1,0 +1,44 @@
+[
+  {
+    "ma": "KH001",
+    "ten": "Công ty TNHH xây dựng và thương mại Trường Linh",
+    "mst": "0102030405",
+    "diaChi": "Số 27 ngõ 159 phố Đông Các, phường ô chợ dừa, Phường Đống Đa, TP Hà Nội",
+    "phanLoai": "Khách hàng",
+    "loaiHinh": "to_chuc",
+    "maCQHNS": "",
+    "dienThoai": "",
+    "nguoiLienHe": "",
+    "email": "",
+    "soTKNH": "",
+    "nganHang": ""
+  },
+  {
+    "ma": "NCC001",
+    "ten": "Công ty CP Chế biến Hải sản Hải Phòng",
+    "mst": "0203040506",
+    "diaChi": "Hải Phòng",
+    "phanLoai": "Khách hàng",
+    "loaiHinh": "to_chuc",
+    "maCQHNS": "",
+    "dienThoai": "",
+    "nguoiLienHe": "",
+    "email": "",
+    "soTKNH": "",
+    "nganHang": ""
+  },
+  {
+    "ma": "0200638946",
+    "ten": "CÔNG TY CP CÔNG NGHỆ SỐ VÀ IN ĐỒ HỌA",
+    "loaiHinh": "to_chuc",
+    "phanLoai": "Khách hàng, Nhà cung cấp",
+    "mst": "0200638946",
+    "maCQHNS": "",
+    "dienThoai": "",
+    "diaChi": "HD35 Vinhomes Marina",
+    "nguoiLienHe": "",
+    "email": "",
+    "soTKNH": "",
+    "nganHang": ""
+  }
+]

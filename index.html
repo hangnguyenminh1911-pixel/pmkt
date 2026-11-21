@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập - Phần mềm Kế toán</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+    <div class="bg-white p-8 rounded-lg shadow-md w-96">
+        <h2 class="text-2xl font-bold text-center text-orange-700 mb-6">KẾ TOÁN THƯƠNG MẠI</h2>
+        
+        <!-- Thêm sự kiện onsubmit để gọi hàm kiểm tra đăng nhập -->
+        <form onsubmit="xuLyDangNhap(event)">
+            
+            <!-- Thêm thẻ hiển thị lỗi nếu có -->
+            <div id="errorMessage" class="mb-4 text-red-500 text-sm text-center hidden"></div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Mã số thuế đơn vị</label>
+                <input type="text" id="mst" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Nhập mã số thuế..." autocomplete="off">
+            </div>
+            <div class="mb-4">
+                <label class="block text-gray-700 text-sm font-bold mb-2">Tên đăng nhập</label>
+                <!-- Thêm id="username" để lấy giá trị -->
+                <input type="text" id="username" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500" placeholder="Nhập tên đăng nhập...">
+            </div>
+            
+            <!-- PHẦN MẬT KHẨU KÈM ICON CON MẮT -->
+            <div>
+                <label class="block font-semibold text-gray-700 mb-1 text-xs">Mật khẩu</label>
+                <div class="relative">
+                    <input type="password" id="password" placeholder="••••••••" class="w-full px-3.5 py-2 border rounded-lg text-sm pr-10 focus:outline-none focus:ring-2 focus:ring-orange-700">
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-600">
+                        <i id="eye-icon" class="fa-solid fa-eye text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <button type="submit" class="w-full bg-orange-700 text-white font-bold py-2 px-4 rounded-lg hover:bg-orange-800 transition duration-200 mb-4">
+                Đăng nhập
+            </button>
+
+            <!-- Bổ sung liên kết sang trang đăng ký tài khoản (Mục 6) -->
+            <div class="text-center mb-2">
+                <a href="register.html" class="text-sm text-orange-700 hover:underline font-medium">
+                    + Đăng ký tài khoản mới
+                </a>
+            </div>
+            <!-- Ô GHI NHỚ TÀI KHOẢN & QUÊN MẬT KHẨU -->
+            <div class="flex items-center justify-between text-xs pt-1">
+                <label class="flex items-center space-x-2 cursor-pointer">
+                    <input type="checkbox" id="remember-me" class="rounded text-orange-900 focus:ring-orange-700">
+                    <span class="text-gray-600 font-medium">Ghi nhớ đăng nhập</span>
+                </label>
+                <a href="#" onclick="moModalQuenMatKhau()" class="text-orange-800 hover:underline font-semibold">Quên mật khẩu?</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Đoạn mã JavaScript xử lý logic đăng nhập chuẩn qua Backend -->
+    <script>
+        async function xuLyDangNhap(event) {
+            if (event) event.preventDefault();
+
+            const mst = document.getElementById('mst').value.trim();
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const rememberMe = document.getElementById('remember-me')?.checked;
+
+            if (!mst || !username || !password) {
+                alert("Vui lòng nhập đầy đủ Mã số thuế, Tên đăng nhập và Mật khẩu!");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mst, username, password })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    // XỬ LÝ GHI NHỚ HOẶC XÓA TÀI KHOẢN TRONG LOCALSTORAGE
+                    if (rememberMe) {
+                        localStorage.setItem('bizmate_saved_mst', mst);
+                        localStorage.setItem('bizmate_saved_user', username);
+                    } else {
+                        localStorage.removeItem('bizmate_saved_mst');
+                        localStorage.removeItem('bizmate_saved_user');
+                    }
+
+                    alert(result.message || "Đăng nhập thành công!");
+                    if (result.role === 'super_admin') {
+                        window.location.href = 'admin.html';
+                    } else {
+                        window.location.href = 'dashboard.html';
+                    }
+                } else {
+                    alert(result.message || "Tài khoản hoặc mật khẩu không chính xác!");
+                }
+            } catch (e) {
+                console.error("Lỗi kết nối:", e);
+                alert("Không thể kết nối đến máy chủ!");
+            }
+        }
+
+        // 1. Ẩn / Hiện mật khẩu
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+
+        // 2. Ghi nhớ tài khoản khi load trang
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedMst = localStorage.getItem('bizmate_saved_mst');
+            const savedUser = localStorage.getItem('bizmate_saved_user');
+            if (savedMst && savedUser) {
+                const mstEl = document.getElementById('mst');
+                const userEl = document.getElementById('username');
+                const chkEl = document.getElementById('remember-me');
+                if (mstEl) mstEl.value = savedMst;
+                if (userEl) userEl.value = savedUser;
+                if (chkEl) chkEl.checked = true;
+            }
+        });
+
+        // 3. Xử lý lưu tài khoản nếu tích chọn Ghi nhớ
+        function xuLyGhiNhoTaiKhoan(mst, username) {
+            const remember = document.getElementById('remember-me').checked;
+            if (remember) {
+                localStorage.setItem('bizmate_saved_mst', mst);
+                localStorage.setItem('bizmate_saved_user', username);
+            } else {
+                localStorage.removeItem('bizmate_saved_mst');
+                localStorage.removeItem('bizmate_saved_user');
+            }
+        }
+        // 4. Xử lý quên mật khẩu
+        function moModalQuenMatKhau() {
+            document.getElementById('reset-mst').value = document.getElementById('mst').value || '';
+            document.getElementById('reset-username').value = document.getElementById('username').value || '';
+            document.getElementById('modal-quen-mat-khau').classList.remove('hidden');
+        }
+
+        function dongModalQuenMatKhau() {
+            document.getElementById('modal-quen-mat-khau').classList.add('hidden');
+        }
+
+        async function thucHienResetMatKhau() {
+            const mst = document.getElementById('reset-mst').value.trim();
+            const username = document.getElementById('reset-username').value.trim();
+
+            if (!mst || !username) {
+                alert("Vui lòng nhập đầy đủ Mã số thuế và Tên đăng nhập!");
+                return;
+            }
+
+            try {
+                const res = await fetch('/api/forgot-password', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ mst, username })
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert(result.message);
+                    dongModalQuenMatKhau();
+                } else {
+                    alert(result.message || "Không tìm thấy thông tin tài khoản phù hợp!");
+                }
+            } catch (e) {
+                console.error(e);
+                alert("Lỗi kết nối máy chủ khi khôi phục mật khẩu!");
+            }
+        }
+    </script>
+<!-- MODAL QUÊN MẬT KHẨU -->
+<div id="modal-quen-mat-khau" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden border">
+        <div class="bg-orange-900 text-white px-6 py-4 flex justify-between items-center">
+            <h3 class="font-bold text-sm flex items-center"><i class="fa-solid fa-key mr-2 text-yellow-300"></i> Khôi phục mật khẩu</h3>
+            <button onclick="dongModalQuenMatKhau()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+        
+        <div class="p-6 space-y-4 text-xs text-gray-700">
+            <p class="text-gray-600">Nhập Mã số thuế và Tên đăng nhập của bạn. Hệ thống sẽ tự động cấp mật khẩu mới và gửi về email đã đăng ký.</p>
+            <div>
+                <label class="block font-semibold text-gray-800 mb-1">Mã số thuế đơn vị *:</label>
+                <input type="text" id="reset-mst" placeholder="Nhập mã số thuế..." class="w-full px-3.5 py-2 border rounded-lg font-mono font-bold text-sm">
+            </div>
+            <div>
+                <label class="block font-semibold text-gray-800 mb-1">Tên đăng nhập *:</label>
+                <input type="text" id="reset-username" placeholder="Nhập tên đăng nhập..." class="w-full px-3.5 py-2 border rounded-lg text-sm">
+            </div>
+        </div>
+
+        <div class="bg-gray-50 px-6 py-3.5 border-t flex justify-end space-x-2">
+            <button onclick="dongModalQuenMatKhau()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-sm">Hủy</button>
+            <button onclick="thucHienResetMatKhau()" class="bg-orange-900 text-white px-5 py-2 rounded-lg font-medium text-sm hover:bg-orange-800 transition shadow-sm">
+                <i class="fa-solid fa-paper-plane mr-1.5"></i> Gửi mật khẩu mới
+            </button>
+        </div>
+    </div>
+</div>
+</body>
+</html>
