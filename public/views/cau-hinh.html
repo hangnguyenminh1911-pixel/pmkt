@@ -1,0 +1,323 @@
+<div id="view-cau-hinh" class="hidden space-y-6 max-w-6xl mx-auto">
+    
+    <!-- Thanh tab điều hướng con trong Cấu hình (Đã đổi tên Tab 2) -->
+    <div class="flex space-x-4 border-b pb-3 text-sm font-semibold">
+        <button onclick="chuyenTabCauHinh('dulieu')" id="tab-btn-dulieu" class="text-orange-900 border-b-2 border-orange-900 pb-1 px-1 transition font-bold">Quản lý dữ liệu</button>
+        <button onclick="chuyenTabCauHinh('thongtin')" id="tab-btn-thongtin" class="text-gray-500 hover:text-gray-800 pb-1 px-1 transition">Thông tin đơn vị</button>
+        <button onclick="chuyenTabCauHinh('tuychon')" id="tab-btn-tuychon" class="text-gray-500 hover:text-gray-800 pb-1 px-1 transition">Tùy chọn hiển thị & Định dạng</button>
+    </div>
+
+    <!-- TAB 1: QUẢN LÝ DỮ LIỆU -->
+    <div id="subview-dulieu" class="space-y-6">
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border">
+            <div class="text-sm text-gray-700 font-medium">
+                <i class="fa-solid fa-database text-orange-900 mr-2"></i> Danh sách cơ sở dữ liệu các kỳ kế toán
+            </div>
+            <div class="flex space-x-2">
+                <button type="button" onclick="moModalThemDuLieu('namtruoc')" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3.5 py-2 rounded-lg text-xs font-semibold border transition flex items-center shadow-xs">
+                    <i class="fa-solid fa-file-arrow-down mr-1.5 text-emerald-600"></i> Thêm dữ liệu từ năm trước
+                </button>
+                <button type="button" onclick="moModalThemDuLieu('moi')" class="bg-emerald-700 hover:bg-emerald-800 text-white px-4 py-2 rounded-lg text-xs font-semibold transition flex items-center shadow-xs">
+                    <i class="fa-solid fa-plus mr-1.5"></i> Thêm dữ liệu mới
+                </button>
+            </div>
+        </div>
+
+        <!-- Khu vực hiển thị danh sách Thẻ Card chi tiết thông tin dữ liệu -->
+        <div id="grid-danh-sach-dulieu" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Render động bằng JavaScript -->
+        </div>
+    </div>
+
+    <!-- TAB 2: THÔNG TIN ĐƠN VỊ (Tối ưu lại nội dung) -->
+    <div id="subview-thongtin" class="hidden space-y-6 max-w-4xl mx-auto">
+        <div class="bg-white p-6 rounded-xl shadow-sm border space-y-6">
+            <div class="border-b pb-4">
+                <h3 class="text-lg font-bold text-orange-900 flex items-center">
+                    <i class="fa-solid fa-building mr-2"></i> Thiết lập thông tin đơn vị & Người ký biểu mẫu
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Quản lý thông tin pháp lý, thông số hạch toán và họ tên người ký dùng chung cho toàn bộ biểu mẫu in ấn A4.</p>
+            </div>
+
+            <div class="space-y-4 text-xs text-gray-700">
+                <div>
+                    <label class="block font-medium mb-1">Chế độ kế toán đang áp dụng</label>
+                    <input type="text" id="config-chedo-ketoan" readonly class="w-full px-3 py-2 border rounded-lg bg-gray-100 font-bold text-orange-900 cursor-not-allowed">
+                    <p class="text-[11px] text-gray-500 mt-0.5 italic">* Được quy định cố định theo kỳ dữ liệu đang làm việc tại tab Quản lý dữ liệu.</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium mb-1">Tên đơn vị / Doanh nghiệp <span class="text-red-500">*</span></label>
+                        <input type="text" id="config-tendonvi" placeholder="Ví dụ: CÔNG TY TNHH BIZMATE" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                    </div>
+                    <div>
+                        <label class="block font-medium mb-1">Mã số thuế <span class="text-red-500">*</span></label>
+                        <input type="text" id="config-mst" placeholder="Mã số thuế..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1">Địa chỉ trụ sở <span class="text-red-500">*</span></label>
+                    <input type="text" id="config-diachi" placeholder="Số nhà, đường phố, phường/xã, quận/huyện, tỉnh/thành phố..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                </div>
+
+                <div>
+                    <label class="block font-medium mb-1">Cơ quan thuế quản lý trực tiếp</label>
+                    <input type="text" id="config-coquanthue" placeholder="Ví dụ: Cục Thuế Thành phố Hải Phòng" class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                </div>
+
+                <!-- ĐỘI NGŨ NHÂN SỰ KÝ BIỂU MẪU -->
+                <div class="border-t pt-4 space-y-3">
+                    <h4 class="font-bold text-gray-800 text-sm flex items-center">
+                        <i class="fa-solid fa-signature mr-2 text-orange-900"></i> Đội ngũ nhân sự ký duyệt biểu mẫu A4
+                    </h4>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-medium mb-1">Người lập phiếu</label>
+                            <input type="text" id="config-nguoilapphieu" placeholder="Họ tên người lập..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Thủ kho</label>
+                            <input type="text" id="config-thukho" placeholder="Họ tên thủ kho..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Kế toán trưởng (nếu có)</label>
+                            <input type="text" id="config-ketoantruong" placeholder="Họ tên kế toán trưởng..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                        </div>
+                        <div>
+                            <label class="block font-medium mb-1">Giám đốc / Đại diện pháp luật</label>
+                            <input type="text" id="config-giamdoc" placeholder="Họ tên giám đốc..." class="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-700">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 flex justify-end space-x-3 border-t">
+                    <button type="button" onclick="taiLaiCauHinh()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium">Khôi phục</button>
+                    <button type="button" onclick="luuCauHinhHeThong()" class="bg-orange-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-800 transition shadow-sm">
+                        <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu thông tin đơn vị
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div> 
+    <!-- TAB 3: TÙY CHỌN HIỂN THỊ & ĐỊNH DẠNG SỐ LIỆU -->
+    <div id="subview-tuychon" class="hidden space-y-6 max-w-4xl mx-auto">
+        <div class="bg-white p-6 rounded-xl shadow-sm border space-y-6">
+            <div class="border-b pb-4">
+                <h3 class="text-lg font-bold text-orange-900 flex items-center">
+                    <i class="fa-solid fa-sliders mr-2"></i> Tùy chọn Định dạng số liệu & Tiền tệ
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Cấu hình số chữ số thập phân cho phần hiển thị số lượng, đơn giá và tiền tệ trên toàn hệ thống.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs text-gray-700">
+                <!-- Cột trái: Đồng tiền kế toán -->
+                <div class="bg-gray-50 p-4 rounded-xl border space-y-4">
+                    <h4 class="font-bold text-gray-800 text-sm border-b pb-2">Đồng tiền kế toán</h4>
+                    <div>
+                        <label class="block font-medium mb-1">Đồng tiền bản vị</label>
+                        <select id="opt-dongtien" class="w-full px-3 py-2 border rounded-lg bg-white font-medium text-orange-900">
+                            <option value="VND">VND (Việt Nam Đồng)</option>
+                            <option value="USD">USD (Đô la Mỹ)</option>
+                            <option value="CNY">CNY (Nhân dân tệ)</option>
+                            <option value="EUR">EUR (Đồng Euro)</option>
+                            <option value="JPY">JPY (Yên Nhật)</option>
+                        </select>
+                        <p class="text-[11px] text-gray-500 mt-1.5 italic">* Dùng làm đồng tiền hạch toán chính và quy đổi tỷ giá khi phát sinh giao dịch ngoại tệ.</p>
+                    </div>
+                </div>
+
+                <!-- Cột phải: Số chữ số phần thập phân -->
+                <div class="bg-gray-50 p-4 rounded-xl border space-y-3">
+                    <h4 class="font-bold text-gray-800 text-sm border-b pb-2">Số chữ số của phần thập phân</h4>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Tiền bản vị</span>
+                        <select id="opt-dec-tien" class="w-24 px-2 py-1.5 border rounded-lg bg-white text-center font-bold">
+                            <option value="0">0</option>
+                            <option value="2">2</option>
+                        </select>
+                    </div>
+                    
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Số lượng</span>
+                        <select id="opt-dec-soluong" class="w-24 px-2 py-1.5 border rounded-lg bg-white text-center font-bold">
+                            <option value="0">0</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Đơn giá</span>
+                        <select id="opt-dec-dongia" class="w-24 px-2 py-1.5 border rounded-lg bg-white text-center font-bold">
+                            <option value="0">0</option>
+                            <option value="2" selected>2</option>
+                            <option value="4">4</option>
+                        </select>
+                    </div>
+
+                    <div class="flex justify-between items-center">
+                        <span class="font-medium">Tỷ giá ngoại tệ</span>
+                        <select id="opt-dec-tygia" class="w-24 px-2 py-1.5 border rounded-lg bg-white text-center font-bold">
+                            <option value="0">0</option>
+                            <option value="2" selected>2</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-4 flex justify-end space-x-3 border-t">
+                <button type="button" onclick="luuTuyChonDinhDang()" class="bg-orange-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-800 transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu cấu hình định dạng
+                </button>
+            </div>
+        </div>
+        <!-- KHỐI BỔ SUNG: KIỂM SOÁT RỦI RO & NGÀY KHÓA SỔ -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border space-y-6 mt-6 max-w-4xl mx-auto">
+            <div class="border-b pb-4">
+                <h3 class="text-lg font-bold text-orange-900 flex items-center">
+                    <i class="fa-solid fa-shield-halved mr-2"></i> Kiểm soát Rủi ro & Ngày khóa sổ hạch toán
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Thiết lập các ngưỡng cảnh báo nghiệp vụ, kiểm soát âm quỹ/kho và ngày khóa sổ tài chính.</p>
+            </div>
+
+            <div class="space-y-4 text-xs text-gray-700">
+                
+                <!-- 1. Kiểm tra âm tiền -->
+                <div class="bg-gray-50 p-4 rounded-xl border space-y-2">
+                    <label class="block font-bold text-gray-800">Kiểm tra âm tiền (Quỹ tiền mặt / Tiền gửi)</label>
+                    <div class="flex space-x-6 pt-1">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amtien" value="0" class="text-orange-900">
+                            <span>Không kiểm soát</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amtien" value="1" checked class="text-orange-900">
+                            <span>Cảnh báo khi âm tiền</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amtien" value="2" class="text-orange-900">
+                            <span>Cảnh báo và Chặn lưu chứng từ</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. Kiểm tra xuất âm kho -->
+                <div class="bg-gray-50 p-4 rounded-xl border space-y-2">
+                    <label class="block font-bold text-gray-800">Kiểm tra xuất âm kho (Vật tư hàng hóa)</label>
+                    <div class="flex space-x-6 pt-1">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amkho" value="0" class="text-orange-900">
+                            <span>Không kiểm soát</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amkho" value="1" checked class="text-orange-900">
+                            <span>Cảnh báo khi tồn kho không đủ</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_amkho" value="2" class="text-orange-900">
+                            <span>Cảnh báo và Chặn xuất kho vượt tồn</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 3. Kiểm tra chi tiền mặt vượt mức Max -->
+                <div class="bg-gray-50 p-4 rounded-xl border space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label class="block font-bold text-gray-800">Kiểm soát hạn mức chi tiền mặt một lần tối đa (VND)</label>
+                        <input type="text" id="opt-max-tienmat" value="5,000,000" oninput="formatNumberInput(this)" class="w-36 px-2.5 py-1 border rounded text-right font-bold text-orange-900 bg-white">
+                    </div>
+                    <div class="flex space-x-6 pt-1">
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_max_tm" value="0" checked class="text-orange-900">
+                            <span>Không kiểm soát</span>
+                        </label>
+                        <label class="flex items-center space-x-2 cursor-pointer">
+                            <input type="radio" name="opt_kiemtra_max_tm" value="1" class="text-orange-900">
+                            <span>Cảnh báo vượt mức</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 4. Ngày khóa sửa, bắt đầu hạch toán -->
+                <div class="grid grid-cols-2 gap-4 bg-amber-50/60 p-4 rounded-xl border border-amber-200">
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Ngày khóa sổ (Khóa sửa dữ liệu trước ngày)</label>
+                        <input type="date" id="opt-ngay-khoaso" class="w-full px-3 py-1.5 border rounded-lg bg-white focus:outline-none">
+                        <p class="text-[11px] text-amber-700 mt-1 italic">* Nhân viên không thể thêm/sửa/xóa chứng từ trước mốc ngày này.</p>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-amber-900 mb-1">Ngày bắt đầu hạch toán dữ liệu</label>
+                        <input type="date" id="opt-ngay-batdau-hach-toan" value="2026-01-01" class="w-full px-3 py-1.5 border rounded-lg bg-white focus:outline-none">
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="pt-4 flex justify-end space-x-3 border-t">
+                <button type="button" onclick="luuKiemSoatRuiRo()" class="bg-orange-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-800 transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu cấu hình kiểm soát
+                </button>
+            </div>
+        </div>
+        <!-- KHỐI BỔ SUNG: MỤC 3 - TÙY CHỌN THAO TÁC NHANH & VẬN HÀNH -->
+        <div class="bg-white p-6 rounded-xl shadow-sm border space-y-6 mt-6 max-w-4xl mx-auto">
+            <div class="border-b pb-4">
+                <h3 class="text-lg font-bold text-orange-900 flex items-center">
+                    <i class="fa-solid fa-bolt mr-2"></i> Tùy chọn Thao tác nhanh & Vận hành
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Tinh chỉnh các thiết lập giao diện nhập liệu và hành vi hệ thống khi lập chứng từ.</p>
+            </div>
+
+            <div class="space-y-3 text-xs text-gray-700">
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Tùy chọn 1 -->
+                    <label class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="opt-giu-manhinh" class="mt-0.5 text-orange-900 rounded focus:ring-orange-700">
+                        <div>
+                            <span class="font-bold text-gray-800 block">Giữ lại màn hình sau khi lưu chứng từ</span>
+                            <span class="text-[11px] text-gray-500">Hữu ích khi cần nhập liên tiếp nhiều phiếu thu, chi hoặc hóa đơn mà không muốn thoát form.</span>
+                        </div>
+                    </label>
+
+                    <!-- Tùy chọn 2 -->
+                    <label class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="opt-canhbao-amkho" checked class="mt-0.5 text-orange-900 rounded focus:ring-orange-700">
+                        <div>
+                            <span class="font-bold text-gray-800 block">Hiển thị đơn giá tồn kho khi chọn vật tư</span>
+                            <span class="text-[11px] text-gray-500">Giúp người lập phiếu thấy ngay giá vốn và số lượng tồn hiện tại của mặt hàng trên lưới nhập.</span>
+                        </div>
+                    </label>
+
+                    <!-- Tùy chọn 3 -->
+                    <label class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="opt-tu-dong-dien" checked class="mt-0.5 text-orange-900 rounded focus:ring-orange-700">
+                        <div>
+                            <span class="font-bold text-gray-800 block">Tự động điền ngày hạch toán theo ngày hệ thống</span>
+                            <span class="text-[11px] text-gray-500">Mặc định ngày chứng từ trùng với ngày hiện tại trên máy tính để tiết kiệm thao tác.</span>
+                        </div>
+                    </label>
+
+                    <!-- Tùy chọn 4 -->
+                    <label class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg border cursor-pointer hover:bg-gray-100 transition">
+                        <input type="checkbox" id="opt-mo-dashboard" class="mt-0.5 text-orange-900 rounded focus:ring-orange-700">
+                        <div>
+                            <span class="font-bold text-gray-800 block">Mở màn hình tổng quan (Dashboard) khi đăng nhập</span>
+                            <span class="text-[11px] text-gray-500">Hiển thị nhanh biểu đồ doanh thu và tình hình tài chính ngay khi vào phần mềm.</span>
+                        </div>
+                    </label>
+                </div>
+
+            </div>
+
+            <div class="pt-4 flex justify-end space-x-3 border-t">
+                <button type="button" onclick="luuTuyChonThaoTacNhanh()" class="bg-orange-900 text-white px-6 py-2 rounded-lg font-medium hover:bg-orange-800 transition shadow-sm">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu tùy chọn thao tác
+                </button>
+            </div>
+        </div>
+    </div>                                
+</div>

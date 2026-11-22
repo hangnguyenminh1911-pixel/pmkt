@@ -1,0 +1,133 @@
+<div id="view-phieu-banhang" class="hidden space-y-4">
+    <!-- Thanh công cụ lọc theo thời gian và tìm kiếm -->
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg shadow-sm border gap-3">
+        <div class="flex items-center space-x-2 flex-wrap gap-2">
+            <div class="flex items-center space-x-1 text-sm text-gray-600">
+                <span>Từ ngày:</span>
+                <input type="date" id="filter-tu-ngay" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-700">
+            </div>
+            <div class="flex items-center space-x-1 text-sm text-gray-600">
+                <span>Đến ngày:</span>
+                <input type="date" id="filter-den-ngay" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-700">
+            </div>
+            <input type="text" id="filter-tim-kiem" onkeyup="if(event.key === 'Enter') apDungLocChungTu()" placeholder="Tìm theo số chứng từ, khách hàng..." class="px-3 py-1.5 border rounded-lg text-sm w-60 focus:outline-none focus:ring-2 focus:ring-orange-700">
+            <button onclick="apDungLocChungTu()" class="bg-orange-900 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-800 transition">Lọc</button>
+            <button onclick="datLaiBoLoc()" class="bg-gray-100 text-gray-700 border px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition" title="Xóa tất cả bộ lọc">Đặt lại</button>
+        </div>
+        <!-- Cụm nút thao tác bên phải: bọc chung vào 1 thẻ div flex để đứng sát nhau -->
+        <div class="flex items-center space-x-2 shrink-0">
+            <!-- Nút Thêm mới -->
+            <button type="button" onclick="openVoucherModal('Phiếu bán hàng')" class="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition flex items-center shadow-xs">
+                <i class="fa-solid fa-plus mr-1.5"></i> Thêm mới
+            </button>
+            <!-- Nút Xóa (ẩn mặc định, chỉ hiện khi có phiếu được tích chọn) -->
+            <button type="button" id="btn-xoa-nhieu-ct" onclick="xoaNhieuChungTu()" class="hidden bg-red-600 hover:bg-red-700 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-xs">
+                <i class="fa-solid fa-trash-can mr-1.5"></i> Xóa (<span id="count-chon-ct">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách phiếu bán hàng -->
+    <div class="bg-white border rounded-lg shadow-sm overflow-visible">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                <tr>
+                    <th class="py-3 px-3 text-center w-10">
+                        <input type="checkbox" id="chk-all-ct" onchange="chonTatCaCT(this)" class="rounded text-orange-900 focus:ring-orange-700 cursor-pointer" title="Chọn tất cả chứng từ">
+                    </th>
+                    <th class="py-3 px-4 text-center w-12">STT</th>
+                    
+                    <!-- Cột Số chứng từ kèm phễu lọc -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('dropdown-filter-soct', event)">
+                            <span>Số chứng từ</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="dropdown-filter-soct" class="hidden absolute left-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo số CT:</p>
+                            <input type="text" id="subfilter-soct" onkeyup="if(event.key === 'Enter') apDungLocChungTu()" placeholder="Nhập số CT..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); apDungLocChungTu();" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- Cột Ngày bán kèm phễu lọc -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('dropdown-filter-ngayban', event)">
+                            <span>Ngày bán</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="dropdown-filter-ngayban" class="hidden absolute left-0 top-full mt-1 w-52 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo ngày:</p>
+                            <input type="date" id="subfilter-ngayban" class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); apDungLocChungTu();" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- Cột Khách hàng kèm phễu lọc -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('dropdown-filter-khachhang', event)">
+                            <span>Khách hàng</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="dropdown-filter-khachhang" class="hidden absolute left-0 top-full mt-1 w-52 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo khách hàng:</p>
+                            <input type="text" id="subfilter-khachhang" onkeyup="if(event.key === 'Enter') apDungLocChungTu()" placeholder="Nhập tên khách hàng..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); apDungLocChungTu();" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- Cột Diễn giải kèm phễu lọc -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between space-x-2 cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('dropdown-filter-diengiai', event)">
+                            <span>Diễn giải</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="dropdown-filter-diengiai" class="hidden absolute right-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case text-left">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo nội dung:</p>
+                            <input type="text" id="subfilter-diengiai" onkeyup="if(event.key === 'Enter') apDungLocChungTu()" placeholder="Nhập diễn giải..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); apDungLocChungTu();" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- Cột Tổng tiền kèm phễu lọc -->
+                    <th class="py-3 px-4 text-right relative">
+                        <div class="flex items-center justify-end space-x-2 cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('dropdown-filter-sotien', event)">
+                            <span>Tổng tiền thanh toán</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="dropdown-filter-sotien" class="hidden absolute right-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case text-left">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Số tiền tối thiểu:</p>
+                            <input type="number" id="subfilter-sotien" onkeyup="if(event.key === 'Enter') apDungLocChungTu()" placeholder="Nhập số tiền..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); apDungLocChungTu();" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <th class="py-3 px-4 text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-danh-sach-banhang" class="divide-y divide-gray-200 text-sm text-gray-700">
+                <!-- Dữ liệu từ Server Node.js sẽ được nạp tự động vào đây -->
+            </tbody>
+        </table>
+
+        <!-- Dòng tổng số dòng -->
+        <div class="bg-gray-50 px-4 py-3 border-t flex justify-between items-center text-sm text-gray-600">
+            <div>
+                Tổng số: <span class="font-bold text-orange-900">01</span> phiếu bán hàng
+            </div>
+            <div class="flex space-x-2 text-xs text-gray-500">
+                <span>Trang 1 / 1</span>
+            </div>
+        </div>
+    </div>
+</div>

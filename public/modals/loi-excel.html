@@ -1,0 +1,44 @@
+<div id="modal-loi-excel" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[80] hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border">
+        <!-- Header cảnh báo -->
+        <div class="bg-red-700 text-white px-5 py-3 flex justify-between items-center">
+            <h3 class="font-bold text-sm flex items-center">
+                <i class="fa-solid fa-triangle-exclamation mr-2 text-yellow-300"></i> 
+                Cảnh báo: Dữ liệu file Excel không hợp lệ
+            </h3>
+            <button type="button" onclick="dongModalLoiExcel()" class="text-white/80 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <div class="p-5 space-y-3 text-xs text-gray-700">
+            <p id="mo-ta-loi-excel" class="text-gray-600 font-medium text-sm">
+                Đã phát hiện các dòng dữ liệu bị lỗi, vui lòng kiểm tra và sửa lại file trước khi nhập:
+            </p>
+
+            <!-- Bảng chi tiết từng dòng lỗi -->
+            <div class="border rounded-lg max-h-64 overflow-y-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-red-50 text-red-800 border-b font-semibold sticky top-0">
+                        <tr>
+                            <th class="py-2 px-3 w-20 text-center">Dòng Excel</th>
+                            <th class="py-2 px-3 w-32">Mã dữ liệu</th>
+                            <th class="py-2 px-3">Nguyên nhân lỗi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-chi-tiet-loi-excel" class="divide-y divide-gray-200">
+                        <!-- Danh sách lỗi được chèn tại đây -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <p class="text-[11px] text-gray-400 italic">
+                * Lưu ý: Các trường đánh dấu (*) là trường bắt buộc không được để trống.
+            </p>
+        </div>
+
+        <div class="bg-gray-50 px-5 py-2.5 border-t flex justify-end">
+            <button type="button" onclick="dongModalLoiExcel()" class="bg-gray-700 hover:bg-gray-800 text-white px-4 py-1.5 rounded-lg font-medium text-xs">
+                Đã hiểu và đóng
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,34 @@
+<div id="modal-preview-sodu" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-4xl w-full max-h-[90vh] flex flex-col overflow-hidden">
+        <!-- Header modal -->
+        <div class="bg-orange-900 text-white px-5 py-3.5 flex justify-between items-center">
+            <h3 id="preview-modal-title" class="font-bold text-sm flex items-center">
+                <i class="fa-solid fa-table-cells mr-2"></i> Kiểm tra & Xem trước dữ liệu Nhập Excel Số dư
+            </h3>
+            <button onclick="dongModalPreviewSoDu()" class="text-white/80 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <!-- Body modal -->
+        <div class="p-5 overflow-y-auto space-y-4 flex-1 text-xs">
+            <!-- Thống kê trạng thái -->
+            <div id="preview-thong-ke" class="flex space-x-4 bg-gray-50 p-3 rounded-lg border font-medium items-center">
+                <!-- Nạp động số lượng dòng hợp lệ / lỗi -->
+            </div>
+
+            <!-- Bảng hiển thị dữ liệu preview & cảnh báo lỗi -->
+            <div class="border rounded-lg overflow-hidden max-h-[50vh] overflow-y-auto">
+                <table id="preview-table-sodu" class="w-full text-left border-collapse">
+                    <!-- Nạp động THEAD và TBODY bằng JS -->
+                </table>
+            </div>
+        </div>
+
+        <!-- Footer modal -->
+        <div class="bg-gray-50 px-5 py-3 border-t flex justify-end space-x-3">
+            <button type="button" onclick="dongModalPreviewSoDu()" class="px-4 py-2 border rounded-lg text-xs font-medium text-gray-700 bg-white hover:bg-gray-100 transition">Hủy bỏ</button>
+            <button type="button" id="btn-xac-nhan-import-sodu" onclick="thucThiImportSoDu()" class="px-4 py-2 bg-orange-900 text-white rounded-lg text-xs font-medium hover:bg-orange-800 transition shadow-xs">
+                Xác nhận nạp vào hệ thống
+            </button>
+        </div>
+    </div>
+</div>

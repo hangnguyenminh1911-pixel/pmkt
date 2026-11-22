@@ -1,0 +1,75 @@
+<div id="view-danhmuc-vthh" class="hidden space-y-4">
+    <!-- Thanh công cụ: Tìm kiếm + Lọc Tính chất + Nút Thêm mới -->
+    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border flex-wrap gap-3">
+        <div class="flex items-center space-x-2 flex-wrap gap-2">
+            <input type="text" id="tim-kiem-vthh" onkeyup="if(event.key === 'Enter') locDanhSachVTHH()" placeholder="Tìm theo mã hoặc tên hàng..." class="px-3.5 py-1.5 border rounded-lg text-sm w-72 focus:outline-none focus:ring-2 focus:ring-orange-700">
+            
+            <!-- Dropdown lọc theo tính chất -->
+            <select id="loc-tinhchat-vthh" onchange="locDanhSachVTHH()" class="px-3 py-1.5 border rounded-lg text-sm bg-white font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-700 cursor-pointer">
+                <option value="tat_ca">-- Tất cả tính chất --</option>
+                <option value="hanghoa">Hàng hóa</option>
+                <option value="dichvu">Dịch vụ</option>
+                <option value="nguyenvatlieu">Nguyên vật liệu</option>
+                <option value="thanhpham">Thành phẩm</option>
+                <option value="congcudungcu">Công cụ dụng cụ</option>
+            </select>
+
+            <button type="button" onclick="locDanhSachVTHH()" class="bg-orange-900 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-800 transition">Tìm</button>
+            <button type="button" onclick="datLaiBoLocVTHH()" class="bg-gray-100 text-gray-700 border px-3 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-200 transition">Đặt lại</button>
+        </div>
+
+        <div class="flex items-center space-x-2 shrink-0">
+            <!-- Nút Xuất Excel (Xuất toàn bộ dữ liệu hiện có) -->
+            <button type="button" onclick="xuatExcelVTHH()" class="bg-emerald-700 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium hover:bg-emerald-800 transition flex items-center shadow-xs">
+                <i class="fa-solid fa-file-excel mr-1.5"></i> Xuất Excel
+            </button>
+
+            <!-- Nút Nhập Excel (Mở popup chọn file & tải file mẫu) -->
+            <button type="button" onclick="moModalChonFileImport('vthh')" class="bg-teal-700 text-white px-3.5 py-1.5 rounded-lg text-sm font-medium hover:bg-teal-800 transition flex items-center shadow-xs">
+                <i class="fa-solid fa-file-import mr-1.5"></i> Nhập Excel
+            </button>
+
+            <!-- Nút Thêm Vật tư hàng hóa -->
+            <button type="button" onclick="moModalThemHH()" class="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition flex items-center shadow-xs">
+                <i class="fa-solid fa-plus mr-1.5"></i> Thêm mới
+            </button>
+            <button type="button" id="btn-xoa-nhieu-vthh" onclick="xoaNhieuVTHH()" class="hidden bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-lg text-sm font-medium transition flex items-center shadow-xs">
+                <i class="fa-solid fa-trash-can mr-1.5"></i> Xóa đã chọn (<span id="count-chon-vthh">0</span>)
+            </button>
+        </div>
+    </div>
+
+    <!-- Bảng danh sách vật tư hàng hóa -->
+    <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                <tr>
+                    <th class="py-3 px-3 text-center w-10">
+                        <input type="checkbox" id="chk-all-vthh" onchange="chonTatCaVTHH(this)" class="rounded text-orange-900 focus:ring-orange-700 cursor-pointer">
+                    </th>
+                    <th class="py-3 px-4 w-12 text-center">STT</th>
+                    <th class="py-3 px-4 text-center">Mã hàng (SKU)</th>
+                    <th class="py-3 px-4 text-center">Tên vật tư, hàng hóa</th>
+                    <th class="py-3 px-4 text-center">Tính chất</th>
+                    <th class="py-3 px-4 text-center">Đơn vị tính</th>
+                    <th class="py-3 px-4 text-center">Giá mua mặc định</th>
+                    <th class="py-3 px-4 text-center">Giá bán mặc định</th>
+                    <th class="py-3 px-4 text-center w-36">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-danhmuc-vthh" class="divide-y divide-gray-200 text-sm text-gray-700">
+                <!-- Dữ liệu nạp từ server -->
+            </tbody>
+        </table>
+
+        <!-- FOOTER: HIỂN THỊ TỔNG SỐ DÒNG HÀNG HÓA -->
+        <div class="bg-gray-50 px-4 py-3 border-t flex justify-between items-center text-sm text-gray-600">
+            <div>
+                Tổng số: <span id="lbl-tong-so-vthh" class="font-bold text-orange-900">00</span> mặt hàng
+            </div>
+            <div class="text-xs text-gray-500">
+                <span>Dữ liệu đồng bộ máy chủ</span>
+            </div>
+        </div>
+    </div>
+</div>

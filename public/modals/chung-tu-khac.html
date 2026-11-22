@@ -1,0 +1,60 @@
+<div id="modal-chung-tu-khac" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col overflow-hidden">
+        <div class="bg-orange-900 text-white px-6 py-3 flex justify-between items-center">
+            <h3 id="ctk-title" class="font-bold text-base">Lập phiếu mới</h3>
+            <button type="button" onclick="dongModalChungTuKhac()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+        <div class="p-6 space-y-4 overflow-y-auto flex-1 text-xs text-gray-700">
+            <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                <div class="font-semibold text-gray-800 text-sm border-b pb-1">Thông tin chung</div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Ngày chứng từ <span class="text-red-500">*</span></label>
+                        <input type="date" id="ctk-ngay" onchange="tuDongSinhSoChungTuKhac()" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Số chứng từ <span class="text-red-500">*</span></label>
+                        <input type="text" id="ctk-so" class="w-full px-2.5 py-1.5 border rounded bg-white font-semibold text-orange-900 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block font-medium text-gray-600 mb-1"><span id="ctk-lbl-doituong">Đối tượng</span> <span class="text-red-500">*</span></label>
+                        <select id="ctk-doituong" onchange="chonDoiTuongCTK(this)" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700"></select>
+                    </div>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div class="col-span-2">
+                        <label class="block font-medium text-gray-600 mb-1">Địa chỉ</label>
+                        <input type="text" id="ctk-diachi" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Địa chỉ">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block font-medium text-gray-600 mb-1" id="ctk-lbl-nguoi">Người nộp / nhận</label>
+                        <input type="text" id="ctk-nguoi" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Họ tên">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-medium text-gray-600 mb-1"><span id="ctk-lbl-diengiai">Diễn giải</span> <span class="text-red-500">*</span></label>
+                    <input type="text" id="ctk-diengiai" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Nội dung chứng từ">
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center">
+                <div class="font-semibold text-gray-800 text-sm" id="ctk-lbl-chitiet">Chi tiết</div>
+                <button type="button" onclick="themDongChungTuKhac()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1 rounded text-xs font-medium"><i class="fa-solid fa-plus mr-1"></i> Thêm dòng</button>
+            </div>
+            <div class="border rounded-lg overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead id="ctk-thead"></thead>
+                    <tbody id="ctk-items" class="text-gray-700"></tbody>
+                </table>
+            </div>
+            <div class="flex justify-end text-sm">
+                <span class="text-gray-600 mr-3">Tổng tiền:</span>
+                <span id="ctk-tong" class="font-bold text-orange-900">0 đ</span>
+            </div>
+        </div>
+        <div class="bg-gray-50 px-6 py-3 border-t flex justify-end space-x-2">
+            <button type="button" onclick="dongModalChungTuKhac()" class="px-4 py-1.5 border rounded-lg text-sm text-gray-700 hover:bg-gray-100">Đóng</button>
+            <button type="button" onclick="luuChungTuKhac()" class="bg-orange-900 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-800"><i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu</button>
+        </div>
+    </div>
+</div>

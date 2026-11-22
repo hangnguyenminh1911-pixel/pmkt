@@ -1,0 +1,327 @@
+<div id="voucher-modal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-7xl max-h-[95vh] flex flex-col overflow-hidden">
+        
+        <!-- Modal Header -->
+        <div class="bg-orange-900 text-white px-6 py-3 flex justify-between items-center">
+            <h3 id="modal-title" class="font-bold text-base">Lập phiếu bán hàng mới</h3>
+            <button onclick="closeVoucherModal()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4 overflow-y-auto flex-1 text-xs text-gray-700">
+            
+            <!-- Phần Thông tin chung -->
+            <div class="bg-gray-50 p-4 rounded-lg border space-y-3">
+                <div class="font-semibold text-gray-800 text-sm border-b pb-1">Thông tin chung</div>
+                <div>
+                    <label class="block font-medium text-gray-600 mb-1">Trạng thái thanh toán</label>
+                    <select class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700">
+                        <option value="chua_tt" selected>Chưa thanh toán</option>
+                        <option value="tt_ngay_tm">Thanh toán ngay (Tiền mặt)</option>
+                        <option value="tt_ngay_ck">Thanh toán ngay (Chuyển khoản)</option>
+                    </select>
+                </div>
+                <div class="grid grid-cols-4 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Ngày chứng từ</label>
+                        <input type="date" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="ngay-chung-tu-ban" onchange="tuDongSinhSoChungTu()">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Số chứng từ</label>
+                        <input type="text" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="so-chung-tu-ban" placeholder="Nhập số chứng từ...">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Số hóa đơn</label>
+                        <input type="text" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="so-hoa-don-ban" placeholder="Nhập số hóa đơn...">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Ký hiệu</label>
+                        <input type="text" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="ky-hieu-ban" placeholder="Ký hiệu hóa đơn">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-4 gap-4 items-end">
+                    <div class="col-span-2 relative">
+                        <label class="block font-medium text-gray-600 mb-1">Đối tượng (Khách hàng)</label>
+                        <div class="flex space-x-1 items-center">
+                            <!-- Ô 1: Chọn mã KH -->
+                            <div class="relative w-1/3">
+                                <input type="text" id="input-makhachhang" onclick="moBangChonKH(event)" onkeyup="locBangChonKH(this.value)" placeholder="Chọn mã KH..." class="w-full px-2.5 py-1.5 border rounded bg-white font-medium text-orange-900 focus:outline-none focus:ring-1 focus:ring-orange-700 cursor-pointer uppercase" autocomplete="off">
+                                <button type="button" onclick="moBangChonKH(event)" class="absolute right-2 top-2.5 text-gray-400 hover:text-orange-900 text-xs">
+                                    <i class="fa-solid fa-chevron-down"></i>
+                                </button>
+                            </div>
+
+                            <!-- Ô 2: Hiển thị tên KH -->
+                            <input type="text" id="ten-khach-hang" class="flex-1 px-2.5 py-1.5 border rounded bg-gray-100 font-medium text-gray-800" placeholder="Tên đơn vị mua hàng" readonly>
+                            
+                            <!-- Cụm 2 nút Thao tác: Thêm mới (+) và Sửa (✏) -->
+                            <div class="flex items-center space-x-1 shrink-0">
+                                <button type="button" onclick="moModalThemDT()" class="w-7 h-7 bg-orange-900 text-white rounded hover:bg-orange-800 font-bold flex items-center justify-center text-xs shadow-xs" title="Thêm nhanh đối tượng">+</button>
+                                <button type="button" onclick="suaDoiTuongHienTai()" class="w-7 h-7 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center justify-center text-xs shadow-xs" title="Sửa thông tin đối tượng này"><i class="fa-solid fa-pen text-[10px]"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- BẢNG DROPDOWN CHỌN KHÁCH HÀNG ĐA CỘT (CHUẨN MISA) -->
+                        <div id="dropdown-table-kh" class="hidden absolute left-0 top-full mt-1 w-[620px] bg-white border border-gray-300 rounded-lg shadow-2xl z-50 text-xs overflow-hidden">
+                            <div class="bg-gray-100 px-3 py-1.5 border-b flex justify-between items-center text-gray-600 font-semibold">
+                                <span>Danh sách khách hàng (Đồng bộ từ Server)</span>
+                                <span class="text-[11px] text-gray-400 font-normal">Gõ mã hoặc tên để tìm nhanh</span>
+                            </div>
+                            <div class="max-h-60 overflow-y-auto">
+                                <table class="w-full text-left border-collapse">
+                                    <thead class="bg-gray-50 border-b text-gray-600 sticky top-0">
+                                        <tr>
+                                            <th class="py-2 px-3 border-r w-24">Mã</th>
+                                            <th class="py-2 px-3 border-r w-64">Tên đối tượng công nợ</th>
+                                            <th class="py-2 px-3 w-32">Mã số thuế</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tbody-bang-chon-kh" class="divide-y divide-gray-200 text-gray-700">
+                                        <!-- Dữ liệu nạp từ server -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="bg-gray-50 px-3 py-1.5 border-t text-[11px] text-gray-500 flex justify-between">
+                                <span>Bấm vào dòng để chọn</span>
+                                <button type="button" onclick="dongBangChonKH()" class="text-red-600 hover:underline">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Ngày hóa đơn</label>
+                        <input type="date" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="ngay-hoa-don-ban" placeholder="Ngày hóa đơn">
+                    </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Người mua</label>
+                        <input type="text" id="input-nguoimua" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Họ tên người mua hàng">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Địa chỉ</label>
+                        <input type="text" id="input-diachi" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Địa chỉ">
+                    </div>
+                    <div>
+                    <label class="block font-medium text-gray-600 mb-1">Hình thức thanh toán</label>
+                    <select class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700">
+                        <option value="TM">Tiền mặt</option>
+                        <option value="CK">Chuyển khoản</option>
+                        <option value="TMCK" selected>TM/CK</option>
+                        <option value="HBT">Hàng biếu tặng</option>
+                        <option value="DTCN">Đối trừ công nợ</option>
+                    </select>
+                </div>
+                    <div>
+                        <label class="block font-medium text-gray-600 mb-1">Diễn giải</label>
+                        <input type="text" class="w-full px-2.5 py-1.5 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" id="diễn-giải" placeholder="Diễn giải chung"> 
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bảng Chi tiết hàng hóa -->
+            <div class="font-semibold text-gray-800 text-sm">Chi tiết hàng hóa</div>
+            <div class="border rounded-lg overflow-x-auto w-full">
+                <table class="w-full text-left border-collapse min-w-[1600px]">
+                    <thead>
+                        <tr class="bg-gray-100 border-b text-gray-600 uppercase tracking-wider text-[11px]">
+                            <th class="py-2 px-2 text-center w-10">STT</th>
+                            <th class="py-2 px-2 text-center w-12">Thao tác</th>
+                            <th class="py-2 px-2 w-52 text-center">Mã Vật tư</th>
+                            <th class="py-2 px-2 w-64 text-center">Tên Vật tư hàng hóa</th>
+                            <th class="py-2 px-2 w-24 text-center">ĐVT</th>
+                            <th class="py-2 px-2 w-20 text-center">SL tồn</th>
+                            <th class="py-2 px-2 w-20 text-center">Số lượng</th>
+                            <th class="py-2 px-2 w-28 text-right">Đơn giá</th>
+                            <th class="py-2 px-2 w-28 text-right">Thành tiền</th>
+                            <th class="py-2 px-2 w-16 text-center">% CK</th>
+                            <th class="py-2 px-2 w-24 text-right">Tiền CK</th>
+                            <th class="py-2 px-2 w-20 text-center">Thuế suất</th>
+                            <th class="py-2 px-2 w-24 text-right">Tiền thuế</th>
+                            <th class="py-2 px-2 w-28 text-right">Tổng thanh toán</th>
+                            <th class="py-2 px-2 w-40">Diễn giải dòng</th>
+                            <th class="py-2 px-2 w-16 text-center">TK Nợ</th>
+                            <th class="py-2 px-2 w-16 text-center">TK Có</th>
+                        </tr>
+                    </thead>
+                    <tbody id="voucher-items" class="divide-y divide-gray-200">
+                    <!-- Dòng mẫu 1 -->
+                    <tr class="hover:bg-gray-50 item-row">
+                        <td class="py-2 px-2 text-center stt text-gray-500 font-medium">1</td>
+                        <td class="py-2 px-2 text-center align-middle">
+                            <div class="flex items-center justify-center space-x-2">
+                                <button type="button" onclick="chenDong(this)" class="text-green-700 hover:text-green-900 text-sm" title="Chèn dòng bên dưới"><i class="fa-solid fa-plus-square"></i></button>
+                                <button type="button" onclick="xoaDong(this)" class="text-red-600 hover:text-red-800 text-sm" title="Xóa dòng"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </td>   
+                        <td class="py-2 px-1">
+                            <div class="flex space-x-1 items-center">
+                                <!-- Ô nhập mã chiếm trọn không gian -->
+                                <div class="relative flex-1">
+                                    <input type="text" onclick="moBangChonHH(this, event)" onkeyup="locBangChonHH(this)" placeholder="Mã..." class="w-full pl-2 pr-4 py-1 border rounded font-semibold text-orange-900 focus:outline-none focus:ring-1 focus:ring-orange-700 item-mahang uppercase bg-white cursor-pointer text-xs" autocomplete="off">
+                                    <i class="fa-solid fa-caret-down absolute right-1.5 top-2 text-gray-400 pointer-events-none text-[9px]"></i>
+                                </div>
+                                
+                                <!-- Nhóm 2 nút thao tác mini tinh tế -->
+                                <div class="flex items-center space-x-0.5 shrink-0">
+                                    <button type="button" onclick="event.stopPropagation(); moModalThemHH(this)" class="w-5 h-5 bg-orange-900/90 text-white rounded hover:bg-orange-800 flex items-center justify-center text-[10px] font-bold shadow-xs transition" title="Thêm nhanh hàng hóa">+</button>
+                                    <button type="button" onclick="event.stopPropagation(); suaHangHoaTaiDong(this)" class="w-5 h-5 bg-blue-600/90 text-white rounded hover:bg-blue-700 flex items-center justify-center text-[9px] shadow-xs transition" title="Sửa thông tin hàng hóa này"><i class="fa-solid fa-pen"></i></button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="py-2 px-2">
+                            <input type="text" onclick="moBangChonHH(this, event)" onkeyup="locBangChonHH(this)" placeholder="Tên hàng hóa..." class="w-full px-2 py-1 border rounded bg-white text-gray-800 focus:outline-none focus:ring-1 focus:ring-orange-700 item-tenhang cursor-pointer">
+                        </td>
+                        <td class="py-2 px-1 text-center">
+                            <select onchange="thayDoiDVT(this)" class="w-full px-1.5 py-1 border rounded bg-white text-xs font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-orange-700 dvt-select cursor-pointer">
+                                <option value="">--</option>
+                            </select>
+                        </td>
+                        <td class="py-2 px-2 text-center text-gray-600 ton font-semibold">0</td>
+                        <td class="py-2 px-2 text-center">
+                            <input type="number" min="0" value="0" oninput="tinhToan()" onchange="kiemTraTonKho(this)" class="w-full px-1 py-1 border rounded text-center focus:outline-none focus:ring-1 focus:ring-orange-700 qty-input" placeholder="0">
+                        </td>
+                        <td class="py-2 px-2 text-right">
+                            <input type="text" value="0" oninput="formatNumberInput(this); tinhToan()" class="w-full px-1 py-1 border rounded text-right focus:outline-none focus:ring-1 focus:ring-orange-700 price-input" placeholder="0">
+                        </td>
+                        <td class="py-2 px-2 text-right font-medium">
+                            <input type="text" oninput="tinhToan()" class="w-full px-2 py-1 border rounded bg-gray-50 text-right font-medium row-thanhtien focus:outline-none" value="0" readonly>    
+                        </td>
+                        <td class="py-2 px-2 text-center">
+                            <input type="number" min="0" max="100" oninput="tinhTheoPhanTramCK(this)" class="w-full px-1 py-1 border rounded text-center focus:outline-none focus:ring-1 focus:ring-orange-700 ck-pct-input" placeholder="0">
+                        </td>
+                        <td class="py-2 px-2 text-right">
+                            <input type="text" oninput="formatNumberInput(this); tinhTheoTienCK(this)" class="w-full px-1 py-1 border rounded text-right focus:outline-none focus:ring-1 focus:ring-orange-700 ck-tien-input" placeholder="0">
+                        </td>
+                        <td class="py-2 px-2 text-center">
+                            <select onchange="tinhToan()" class="w-full px-1.5 py-1 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700 thuesuat-select">
+                                <option value="0.08">8%</option>
+                                <option value="0.10">10%</option>
+                                <option value="0">0%</option>
+                                <option value="KCT">KCT</option>
+                                <option value="KKKNT">KKKNT</option>
+                            </select>
+                        </td>
+                        <td class="py-2 px-2 text-right font-medium">
+                            <input type="text" class="w-full px-2 py-1 border rounded bg-gray-50 text-right font-medium row-tienthue focus:outline-none" value="0">
+                        </td>
+                        <td class="py-2 px-2 text-right font-semibold text-orange-900">
+                            <input type="text" class="w-full px-2 py-1 border rounded bg-gray-50 text-right font-bold text-orange-900 row-tongthanhtoan focus:outline-none" value="0" readonly>
+                        </td>
+                        <td class="py-2 px-2">
+                            <input type="text" placeholder="Diễn giải dòng..." class="w-full px-1.5 py-1 border rounded text-xs focus:outline-none focus:ring-1 focus:ring-orange-700">
+                        </td>
+                        <td class="py-2 px-2 text-center">
+                            <input type="text" value="131" class="w-full px-1 py-1 border rounded text-center text-xs focus:outline-none focus:ring-1 focus:ring-orange-700">
+                        </td>
+                        <td class="py-2 px-2 text-center">
+                            <input type="text" value="5111" class="w-full px-1 py-1 border rounded text-center text-xs focus:outline-none focus:ring-1 focus:ring-orange-700">
+                        </td>
+                            <td class="py-2 px-2">
+                                <select class="w-full px-1.5 py-1 border rounded bg-white focus:outline-none focus:ring-1 focus:ring-orange-700">
+                                    <option>Thương mại dịch vụ</option>
+                                    <option>Sản xuất chế biến</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- POPUP BẢNG CHỌN HÀNG HÓA ĐA CỘT (MÃ, TÊN, ĐVT, TỒN, GIÁ) -->
+                <div id="dropdown-table-hh" class="hidden fixed bg-white border border-gray-400 rounded-lg shadow-2xl z-[9999] w-[720px] text-xs overflow-hidden">
+                    <div class="bg-amber-100 px-3 py-1.5 border-b border-amber-200 flex justify-between items-center text-orange-950 font-bold">
+                        <span><i class="fa-solid fa-boxes-stacked mr-1"></i> Danh mục Vật tư, Hàng hóa</span>
+                        <span class="text-[11px] text-gray-500 font-normal">Gõ mã hoặc tên để tìm kiếm nhanh</span>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100 text-gray-700 sticky top-0 border-b text-[11px] uppercase">
+                                <tr>
+                                    <th class="py-2 px-2 border-r w-28">Mã</th>
+                                    <th class="py-2 px-2 border-r">Tên</th>
+                                    <th class="py-2 px-2 border-r w-16 text-center">ĐVT</th>
+                                    <th class="py-2 px-2 border-r w-20 text-right">SL tồn</th>
+                                    <th class="py-2 px-2 w-28 text-right">Đơn giá bán</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-bang-chon-hh" class="divide-y divide-gray-200 text-gray-800">
+                                <!-- Dữ liệu nạp từ server -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="bg-gray-50 px-3 py-1.5 border-t flex justify-between items-center text-[11px]">
+                        <button type="button" onclick="moModalThemHH()" class="text-orange-900 font-semibold hover:underline">
+                            <i class="fa-solid fa-plus-circle mr-1"></i> (F6) Thêm mới hàng hóa
+                        </button>
+                        <button type="button" onclick="dongBangChonHH()" class="text-red-600 hover:underline">Đóng [Esc]</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Nút thêm dòng & Phần Chiết khấu hóa đơn -->
+            <div class="flex justify-between items-center pt-2">
+                <button onclick="themDong()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded text-xs font-medium border transition">
+                    <i class="fa-solid fa-plus mr-1"></i> Thêm dòng hàng
+                </button>
+
+                <!-- Phần Chiết khấu HĐ theo yêu cầu -->
+                <div class="flex items-center space-x-2 bg-gray-50 p-2 rounded border">
+                    <span class="font-medium text-gray-700">Chiết khấu HĐ:</span>
+                    <input type="text" id="ck-hd-input" value="" oninput="formatNumberInput(this); onThayDoiCKHD(this)" class="w-28 px-2 py-1 border rounded text-right bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="0">
+                    <select id="phanbo-type" class="px-2 py-1 border rounded bg-white text-xs">
+                        <option value="soluong">Phân bổ theo số lượng</option>
+                        <option value="sotien">Phân bổ theo số tiền</option>
+                    </select>
+                    <button onclick="phanBoChietKhauHD()" class="bg-orange-900 text-white px-3 py-1 rounded hover:bg-orange-800 font-medium">Phân bổ chiết khấu</button>
+                </div>
+            </div>
+
+            <!-- Footer / Tổng cộng theo đúng yêu cầu comment A15 -->
+            <div class="bg-gray-50 p-4 rounded-lg border flex justify-between items-center text-sm font-bold text-gray-800">
+                <div class="space-y-1 text-xs font-normal text-gray-600">
+                    <div>Tổng tiền hàng (đã trừ CK chi tiết): <span id="lbl-tong-tien-hang" class="font-bold text-gray-900">0 đ</span></div>
+                    <div>Tổng tiền chiết khấu: <span id="lbl-tong-tien-ck" class="font-bold text-orange-900">0 đ</span></div>
+                    <div>Tổng tiền thuế VAT: <span id="lbl-tong-tien-thue" class="font-bold text-gray-900">0 đ</span></div>
+                </div>
+                <div class="text-right space-y-1">
+                    <div class="text-xs text-gray-600">Tổng thanh toán hóa đơn:</div>
+                    <div id="lbl-tong-thanh-toan" class="text-orange-900 text-xl font-extrabold">0 đ</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Modal Lập phiếu: Nút In dạng Dropdown chuyên nghiệp -->
+        <div class="bg-gray-50 px-6 py-3 border-t flex justify-between items-center relative">
+            <!-- Nút "In chứng từ ▾" dạng Dropdown -->
+            <div class="relative inline-block text-left">
+                <button type="button" onclick="toggleMenuInDropdown(event)" class="bg-white border border-gray-300 hover:bg-gray-50 text-gray-800 font-semibold px-3.5 py-1.5 rounded-lg text-xs shadow-xs flex items-center transition">
+                    <i class="fa-solid fa-print mr-1.5 text-emerald-600"></i> In chứng từ 
+                    <i class="fa-solid fa-chevron-down ml-2 text-[10px] text-gray-500"></i>
+                </button>
+
+                <!-- Menu 4 mẫu in xổ lên phía trên -->
+                <div id="dropdown-menu-in" class="hidden absolute left-0 bottom-full mb-1.5 w-56 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 text-xs">
+                    <button type="button" onclick="inPhieuHienTai('PBH')" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 text-gray-700 flex items-center">
+                        <i class="fa-regular fa-file-lines mr-2 text-emerald-600"></i> 1. Phiếu bán hàng
+                    </button>
+                    <button type="button" onclick="inPhieuHienTai('PXK')" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 text-gray-700 flex items-center">
+                        <i class="fa-solid fa-boxes-packing mr-2 text-blue-600"></i> 2. Phiếu xuất kho
+                    </button>
+                    <button type="button" onclick="inPhieuHienTai('PTM')" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 text-gray-700 flex items-center">
+                        <i class="fa-solid fa-money-bill-wave mr-2 text-amber-600"></i> 3. Phiếu thu tiền mặt
+                    </button>
+                    <button type="button" onclick="inPhieuHienTai('PNH')" class="w-full text-left px-3.5 py-2 hover:bg-emerald-50 text-gray-700 flex items-center">
+                        <i class="fa-solid fa-building-columns mr-2 text-purple-600"></i> 4. Phiếu thu ngân hàng
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cụm 2 nút Đóng & Lưu bên phải -->
+            <div class="flex items-center space-x-2">
+                <button type="button" onclick="closeVoucherModal()" class="px-4 py-2 border rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-100 transition">Đóng</button>
+                <button type="button" onclick="luuChungTu()" class="bg-orange-900 text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-orange-800 transition">Lưu chứng từ</button>
+            </div>
+        </div>
+    </div>
+</div>

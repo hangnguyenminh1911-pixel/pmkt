@@ -1,0 +1,30 @@
+<div id="view-danhmuc-nganhang" class="hidden space-y-4">
+    <!-- Thanh công cụ -->
+    <div class="flex justify-between items-center bg-white p-4 rounded-lg shadow-sm border">
+        <div class="text-sm text-gray-600">
+            <i class="fa-solid fa-circle-info text-emerald-600 mr-1"></i> Khai báo các tài khoản ngân hàng phục vụ giao dịch chuyển khoản.
+        </div>
+        <button type="button" onclick="moModalThemNganHang()" class="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition flex items-center shadow-xs">
+            <i class="fa-solid fa-plus mr-1.5"></i> Thêm tài khoản ngân hàng
+        </button>
+    </div>
+
+    <!-- Bảng danh sách -->
+    <div class="bg-white border rounded-lg shadow-sm overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                <tr>
+                    <th class="py-3 px-4 w-12 text-center">STT</th>
+                    <th class="py-3 px-4">Số tài khoản (STK)</th>
+                    <th class="py-3 px-4">Tên ngân hàng</th>
+                    <th class="py-3 px-4">Chi nhánh</th>
+                    <th class="py-3 px-4 text-center">TK kế toán ngầm định</th>
+                    <th class="py-3 px-4 text-center w-32">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-danhmuc-nganhang" class="divide-y divide-gray-200 text-sm text-gray-700">
+                <!-- Nạp dữ liệu động bằng JavaScript -->
+            </tbody>
+        </table>
+    </div>
+</div>

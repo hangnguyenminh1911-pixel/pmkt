@@ -356,7 +356,7 @@
         }
 
         // Tự động nạp dữ liệu từ Server mỗi khi mở trang hoặc ấn F5
-        window.addEventListener('DOMContentLoaded', () => {
+        khiGiaoDienSanSang(() => {
             taiDanhSachChungTu();
         });
         // Mở Modal Lập phiếu bán hàng
@@ -674,7 +674,7 @@
         });
 
         // Tải thêm danh mục hàng hóa khi mở trang
-        window.addEventListener('DOMContentLoaded', async () => {
+        khiGiaoDienSanSang(async () => {
             taiDanhSachChungTu();
             taiDanhSachDoiTuong();
             await taiDanhSachHangHoa(); // Chờ server gửi đủ dữ liệu hàng hóa về
@@ -1369,7 +1369,7 @@ async function themNhanhKhachHang() {
 }
 
 // Tự động tải danh mục khách hàng khi mở trang
-window.addEventListener('DOMContentLoaded', async () => {
+khiGiaoDienSanSang(async () => {
     taiDanhSachChungTu();
     await taiDanhSachDoiTuong(); // Chờ nạp đối tượng từ server
     hienThiDanhSachDT();          // Vẽ ngay ra bảng danh mục đối tượng

@@ -1,0 +1,262 @@
+<div id="view-sodu-dauky" class="hidden space-y-4">
+    
+    <!-- THANH TAB CHUYỂN ĐỔI GỌN GÀNG -->
+    <div class="flex space-x-4 bg-white p-3 rounded-lg shadow-sm border mb-4 text-sm font-semibold">
+        <button onclick="chuyenTabSoDu('kho')" id="tab-sodu-kho" class="text-orange-900 border-b-2 border-orange-900 pb-1 px-2 transition font-bold">
+            <i class="fa-solid fa-boxes-stacked mr-1.5"></i> 1. Tồn kho
+        </button>
+        <button onclick="chuyenTabSoDu('congno')" id="tab-sodu-congno" class="text-gray-500 hover:text-gray-800 pb-1 px-2 transition">
+            <i class="fa-solid fa-file-invoice-dollar mr-1.5"></i> 2. Công nợ (131 / 331)
+        </button>
+        <button onclick="chuyenTabSoDu('tien')" id="tab-sodu-tien" class="text-gray-500 hover:text-gray-800 pb-1 px-2 transition">
+            <i class="fa-solid fa-building-columns mr-1.5"></i> 3. Tài khoản tiền (111, 112)
+        </button>
+    </div>
+
+    <!-- TAB 1: SỐ DƯ TỒN KHO ĐẦU KỲ -->
+    <div id="subview-sodu-kho" class="space-y-3">
+        <div class="bg-white p-3 rounded-lg shadow-sm border flex justify-between items-center flex-wrap gap-2">
+            <p class="text-xs text-gray-500"><i class="fa-solid fa-circle-info mr-1 text-emerald-600"></i> Khai báo số lượng tồn và đơn giá vốn ban đầu cho các mặt hàng.</p>
+            
+            <!-- Nhóm nút thao tác của Tồn kho -->
+            <div class="flex items-center space-x-2 flex-wrap gap-1.5 text-xs">
+                <button type="button" onclick="taiFileMauExcelSoDu('kho')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-download mr-1 text-emerald-600"></i> Tải mẫu
+                </button>
+                <!-- NÚT NHẬP EXCEL DẠNG DROPDOWN CHO TỒN KHO -->
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleMenuNhapExcel('dropdown-nhap-kho', event)" class="bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-300 px-3 py-1.5 rounded-lg font-medium transition flex items-center">
+                        <i class="fa-solid fa-file-arrow-up mr-1.5 text-orange-800"></i> Nhập Excel 
+                        <i class="fa-solid fa-chevron-down ml-1.5 text-[10px]"></i>
+                    </button>
+
+                    <!-- Menu lựa chọn xổ xuống -->
+                    <div id="dropdown-nhap-kho" class="hidden absolute right-0 mt-1.5 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 text-xs">
+                        <label class="w-full text-left px-3.5 py-2 hover:bg-orange-50 text-gray-700 flex items-center cursor-pointer">
+                            <i class="fa-solid fa-plus mr-2 text-orange-800"></i> Thêm mới
+                            <input type="file" accept=".xlsx, .xls" onchange="xuLyImportExcelSoDu(event, 'kho', 'themmoi')" class="hidden">
+                        </label>
+                        <label class="w-full text-left px-3.5 py-2 hover:bg-blue-50 text-gray-700 flex items-center cursor-pointer border-t">
+                            <i class="fa-solid fa-pen-to-square mr-2 text-blue-700"></i> Cập nhật
+                            <input type="file" accept=".xlsx, .xls" onchange="xuLyImportExcelSoDu(event, 'kho', 'capnhat')" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <button type="button" onclick="xuatExcelSoDuPhanHe('kho')" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-file-excel mr-1 text-blue-600"></i> Xuất Excel
+                </button>
+                <span class="text-gray-300">|</span>
+                <button type="button" onclick="datLaiSoDuKhoVeKhong()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg font-medium border transition">
+                    <i class="fa-solid fa-rotate-left mr-1 text-orange-800"></i> Đặt lại 0
+                </button>
+                <button type="button" onclick="luuSoDuTonKho()" class="bg-orange-900 text-white px-3.5 py-1.5 rounded-lg font-medium hover:bg-orange-800 transition shadow-xs">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu số dư
+                </button>
+            </div>
+        </div>
+
+        <!-- THANH CÔNG CỤ: TÌM KIẾM NHANH + LỌC -->
+        <div class="flex items-center justify-between flex-wrap gap-2 text-xs">
+            <label class="flex items-center space-x-2 cursor-pointer bg-amber-50 px-3 py-1.5 rounded border border-amber-200">
+                <input type="checkbox" id="chk-chi-hien-thi-co-sodu-kho" onchange="renderSoDuTonKho()" class="rounded text-orange-900">
+                <span class="font-bold text-amber-900">Chỉ hiển thị các dòng có phát sinh số dư tồn kho (Ẩn dòng bằng 0)</span>
+            </label>
+
+            <!-- Ô tìm kiếm nhanh -->
+            <div class="relative">
+                <input type="text" id="search-sodu-kho" onkeyup="renderSoDuTonKho()" placeholder="Tìm theo mã hoặc tên hàng..." class="pl-8 pr-3 py-1.5 border rounded-lg text-xs w-64 bg-white focus:outline-none focus:ring-1 focus:ring-orange-700">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400"></i>
+            </div>
+        </div>
+
+        <!-- BẢNG CỐ ĐỊNH TIÊU ĐỀ (STICKY HEADER) -->
+        <div class="bg-white border rounded-lg shadow-sm overflow-hidden max-h-[62vh] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs relative">
+                <thead class="bg-gray-100 text-gray-700 uppercase tracking-wider sticky top-0 z-10 shadow-xs border-b">
+                    <tr>
+                        <th class="py-3 px-4 text-center w-12 bg-gray-100">STT</th>
+                        <th class="py-3 px-4 w-32 text-center bg-gray-100">Mã hàng</th>
+                        <th class="py-3 px-4 text-center bg-gray-100">Tên vật tư, hàng hóa</th>
+                        <th class="py-3 px-4 text-center w-24 bg-gray-100">ĐVT</th>
+                        <th class="py-3 px-4 text-center w-32 bg-gray-100">Số lượng</th>
+                        <th class="py-3 px-4 text-center w-36 bg-gray-100">Đơn giá</th>
+                        <th class="py-3 px-4 text-center w-40 bg-gray-100">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-sodu-tonkho" class="divide-y divide-gray-200 text-gray-700">
+                    <!-- Nạp động bằng JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FOOTER TỔNG CỘNG ĐẶT NGOÀI BẢNG ĐỂ LUÔN NHÌN THẤY -->
+        <div class="bg-gray-100 border px-4 py-3 rounded-lg flex justify-between items-center text-xs font-bold text-gray-900 shadow-xs">
+            <span class="uppercase text-gray-700">Tổng cộng tồn kho:</span>
+            <div class="space-x-6">
+                <span>Tổng SL: <b id="footer-tong-sl-ton" class="text-orange-900">0</b></span>
+                <span>Tổng giá trị: <b id="footer-tong-tien-ton" class="text-orange-900 text-sm">0 đ</b></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 2: SỐ DƯ CÔNG NỢ ĐẦU KỲ -->
+    <div id="subview-sodu-congno" class="hidden space-y-3">
+        <div class="bg-white p-3 rounded-lg shadow-sm border flex justify-between items-center flex-wrap gap-2">
+            <p class="text-xs text-gray-500"><i class="fa-solid fa-circle-info mr-1 text-emerald-600"></i> Nhập số dư công nợ ban đầu (Nợ 131 hoặc Có 331) cho đối tượng.</p>
+            
+            <!-- Nhóm nút thao tác của Công nợ -->
+            <div class="flex items-center space-x-2 flex-wrap gap-1.5 text-xs">
+                <button type="button" onclick="taiFileMauExcelSoDu('congno')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-download mr-1 text-emerald-600"></i> Tải mẫu
+                </button>
+                <!-- NÚT NHẬP EXCEL DẠNG DROPDOWN CHO CÔNG NỢ -->
+                <div class="relative inline-block text-left">
+                    <button type="button" onclick="toggleMenuNhapExcel('dropdown-nhap-cn', event)" class="bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-300 px-3 py-1.5 rounded-lg font-medium transition flex items-center">
+                        <i class="fa-solid fa-file-arrow-up mr-1.5 text-orange-800"></i> Nhập Excel 
+                        <i class="fa-solid fa-chevron-down ml-1.5 text-[10px]"></i>
+                    </button>
+
+                    <div id="dropdown-nhap-cn" class="hidden absolute right-0 mt-1.5 w-44 bg-white rounded-lg shadow-xl border border-gray-200 py-1 z-50 text-xs">
+                        <label class="w-full text-left px-3.5 py-2 hover:bg-orange-50 text-gray-700 flex items-center cursor-pointer">
+                            <i class="fa-solid fa-plus mr-2 text-orange-800"></i> Thêm mới
+                            <input type="file" accept=".xlsx, .xls" onchange="xuLyImportExcelSoDu(event, 'congno', 'themmoi')" class="hidden">
+                        </label>
+                        <label class="w-full text-left px-3.5 py-2 hover:bg-blue-50 text-gray-700 flex items-center cursor-pointer border-t">
+                            <i class="fa-solid fa-pen-to-square mr-2 text-blue-700"></i> Cập nhật
+                            <input type="file" accept=".xlsx, .xls" onchange="xuLyImportExcelSoDu(event, 'congno', 'capnhat')" class="hidden">
+                        </label>
+                    </div>
+                </div>
+                <button type="button" onclick="xuatExcelSoDuPhanHe('congno')" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-file-excel mr-1 text-blue-600"></i> Xuất Excel
+                </button>
+                <span class="text-gray-300">|</span>
+                <button type="button" onclick="datLaiSoDuCNVeKhong()" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-2.5 py-1.5 rounded-lg font-medium border transition">
+                    <i class="fa-solid fa-rotate-left mr-1 text-orange-800"></i> Đặt lại 0
+                </button>
+                <button type="button" onclick="luuSoDuCongNo()" class="bg-orange-900 text-white px-3.5 py-1.5 rounded-lg font-medium hover:bg-orange-800 transition shadow-xs">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu số dư
+                </button>
+            </div>
+        </div>
+
+        <!-- THANH CÔNG CỤ: LỌC PHÂN LOẠI + TÌM KIẾM NHANH + CHECKBOX ẨN DÒNG BẰNG 0 -->
+        <div class="flex items-center justify-between flex-wrap gap-2 text-xs">
+            <div class="flex items-center space-x-2 flex-wrap gap-2">
+                <!-- Dropdown lọc theo phân loại đối tượng -->
+                <select id="filter-phanloai-cn" onchange="renderSoDuCongNo()" class="px-3 py-1.5 border rounded-lg bg-white font-medium text-gray-700 focus:outline-none focus:ring-1 focus:ring-orange-700 cursor-pointer">
+                    <option value="tat_ca">-- Tất cả phân loại --</option>
+                    <option value="khach_hang">Khách hàng</option>
+                    <option value="nha_cung_cap">Nhà cung cấp</option>
+                </select>
+
+                <label class="flex items-center space-x-2 cursor-pointer bg-amber-50 px-3 py-1.5 rounded border border-amber-200">
+                    <input type="checkbox" id="chk-chi-hien-thi-co-sodu-cn" onchange="renderSoDuCongNo()" class="rounded text-orange-900">
+                    <span class="font-bold text-amber-900">Chỉ hiển thị dòng có phát sinh công nợ (Ẩn dòng bằng 0)</span>
+                </label>
+            </div>
+
+            <!-- Ô tìm kiếm nhanh (hỗ trợ tìm cả theo MST) -->
+            <div class="relative">
+                <input type="text" id="search-sodu-cn" onkeyup="renderSoDuCongNo()" class="pl-8 pr-3 py-1.5 border rounded-lg text-xs w-64 bg-white focus:outline-none focus:ring-1 focus:ring-orange-700" placeholder="Tìm theo mã, tên hoặc MST...">
+                <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-gray-400"></i>
+            </div>
+        </div>
+
+        <!-- BẢNG CỐ ĐỊNH TIÊU ĐỀ (ĐÃ ĐIỀU CHỈNH ĐỘ RỘNG CỘT & THÊM CỘT MST) -->
+        <div class="bg-white border rounded-lg shadow-sm overflow-hidden max-h-[62vh] overflow-y-auto">
+            <table class="w-full text-left border-collapse text-xs relative">
+                <thead class="bg-gray-100 text-gray-700 uppercase tracking-wider sticky top-0 z-10 shadow-xs border-b">
+                    <tr>
+                        <th class="py-3 px-3 text-center w-12 bg-gray-100">STT</th>
+                        <th class="py-3 px-3 w-40 bg-gray-100">Mã đối tượng</th> <!-- Mở rộng cột mã -->
+                        <th class="py-3 px-3 w-32 bg-gray-100">Mã số thuế</th>    <!-- Thêm cột Mã số thuế -->
+                        <th class="py-3 px-4 bg-gray-100">Tên khách hàng / Nhà cung cấp</th> <!-- Thu hẹp vừa phải, nhường chỗ cho mã và MST -->
+                        <th class="py-3 px-3 text-center w-28 bg-gray-100">Phân loại</th>
+                        <th class="py-3 px-3 text-right w-36 bg-gray-100">Dư nợ đầu kỳ (131)</th>
+                        <th class="py-3 px-3 text-right w-36 bg-gray-100">Dư có đầu kỳ (331)</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-sodu-congno" class="divide-y divide-gray-200 text-gray-700">
+                    <!-- Nạp động bằng JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- FOOTER TỔNG CỘNG -->
+        <div class="bg-gray-100 border px-4 py-3 rounded-lg flex justify-between items-center text-xs font-bold text-gray-900 shadow-xs">
+            <span class="uppercase text-gray-700">Tổng cộng công nợ đầu kỳ:</span>
+            <div class="space-x-6">
+                <span>Tổng Dư Nợ (131): <b id="footer-tong-no-131" class="text-blue-800 text-sm">0 đ</b></span>
+                <span>Tổng Dư Có (331): <b id="footer-tong-co-331" class="text-red-700 text-sm">0 đ</b></span>
+            </div>
+        </div>
+    </div>
+    <!-- TAB 3: SỐ DƯ TÀI KHOẢN TIỀN (111, 112) -->
+    <div id="subview-sodu-tien" class="hidden space-y-4">
+        <div class="bg-white p-3 rounded-lg shadow-sm border flex justify-between items-center flex-wrap gap-2">
+            <p class="text-xs text-gray-500"><i class="fa-solid fa-circle-info mr-1 text-emerald-600"></i> Khai báo số dư quỹ tiền mặt (1111) và các tài khoản tiền gửi ngân hàng (1121).</p>
+            
+            <!-- Nhóm nút thao tác của Tài khoản tiền -->
+            <div class="flex items-center space-x-2 flex-wrap gap-1.5 text-xs">
+                <button type="button" onclick="taiFileMauExcelSoDu('tien')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-download mr-1 text-emerald-600"></i> Tải mẫu
+                </button>
+                <label class="bg-orange-50 hover:bg-orange-100 text-orange-900 border border-orange-300 px-2.5 py-1.5 rounded-lg font-medium transition cursor-pointer flex items-center">
+                    <i class="fa-solid fa-upload mr-1 text-orange-800"></i> Nhập Excel
+                    <input type="file" id="file-import-tien" accept=".xlsx, .xls" onchange="xuLyImportExcelSoDu(event, 'tien')" class="hidden">
+                </label>
+                <button type="button" onclick="xuatExcelSoDuPhanHe('tien')" class="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-300 px-2.5 py-1.5 rounded-lg font-medium transition flex items-center">
+                    <i class="fa-solid fa-file-excel mr-1 text-blue-600"></i> Xuất Excel
+                </button>
+                <span class="text-gray-300">|</span>
+                <button type="button" onclick="luuSoDuTaiKhoanTien()" class="bg-orange-900 text-white px-3.5 py-1.5 rounded-lg font-medium hover:bg-orange-800 transition shadow-xs">
+                    <i class="fa-solid fa-floppy-disk mr-1.5"></i> Lưu số dư
+                </button>
+            </div>
+        </div>
+
+        <!-- 1. QUỸ TIỀN MẶT (1111) -->
+        <div class="bg-white border rounded-lg shadow-sm p-5 space-y-3">
+            <h4 class="font-bold text-gray-800 text-xs uppercase tracking-wider text-orange-900 flex items-center">
+                <i class="fa-solid fa-money-bill-wave mr-2"></i> 1. Quỹ tiền mặt (Tài khoản 1111)
+            </h4>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-2xl">
+                <div>
+                    <label class="block font-medium mb-1 text-xs text-gray-600">Số dư tiền mặt đầu kỳ (VND)</label>
+                    <input type="text" id="sodu-tienmat-vnd" value="0" onfocus="this.select()" oninput="formatNumberInput(this)" class="w-full px-3 py-2 border rounded-lg text-right font-bold text-orange-900 text-sm focus:outline-none focus:ring-1 focus:ring-orange-700 bg-white">
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. TIỀN GỬI NGÂN HÀNG (1121) -->
+        <div class="bg-white border rounded-lg shadow-sm p-5 space-y-3">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h4 class="font-bold text-gray-800 text-xs uppercase tracking-wider text-orange-900 flex items-center">
+                    <i class="fa-solid fa-building-columns mr-2"></i> 2. Tiền gửi ngân hàng (Tài khoản 1121)
+                </h4>
+                <button type="button" onclick="themDongNganHang()" class="bg-emerald-700 hover:bg-emerald-800 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition flex items-center shadow-xs">
+                    <i class="fa-solid fa-plus mr-1"></i> Thêm tài khoản ngân hàng
+                </button>
+            </div>
+
+            <div class="border rounded-lg overflow-x-auto">
+                <table class="w-full text-left border-collapse text-xs">
+                    <thead class="bg-gray-100 text-gray-700 uppercase tracking-wider border-b">
+                        <tr>
+                            <th class="py-2.5 px-3 text-center w-12">STT</th>
+                            <th class="py-2.5 px-3 w-40">Số tài khoản</th>
+                            <th class="py-2.5 px-3">Tên ngân hàng & Chi nhánh</th>
+                            <th class="py-2.5 px-3 text-right w-48">Số dư đầu kỳ (VND)</th>
+                            <th class="py-2.5 px-3 text-center w-16">Xóa</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbody-sodu-nganhang" class="divide-y divide-gray-200">
+                        <!-- Nạp động bằng JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>

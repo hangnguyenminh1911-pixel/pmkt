@@ -1,0 +1,55 @@
+<div id="modal-chon-file-import" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[75] hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-xl overflow-hidden border">
+        <!-- Header -->
+        <div class="bg-orange-950 text-white px-5 py-3.5 flex justify-between items-center">
+            <h3 id="import-dialog-title" class="font-bold text-sm flex items-center">
+                <i class="fa-solid fa-file-excel mr-2 text-emerald-400"></i> Nhập khẩu danh mục từ Excel
+            </h3>
+            <button type="button" onclick="dongModalChonFileImport()" class="text-white/80 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-6 space-y-5 text-xs text-gray-700">
+            <!-- Bước 1: Hướng dẫn & Tải file mẫu -->
+            <div class="bg-amber-50 border border-amber-200 rounded-lg p-3.5 flex items-start justify-between">
+                <div class="space-y-1">
+                    <p class="font-bold text-orange-900 text-xs flex items-center">
+                        <i class="fa-solid fa-circle-info mr-1.5"></i> Bước 1: Sử dụng file mẫu chuẩn
+                    </p>
+                    <p class="text-gray-600 text-[11px]">
+                        Để hệ thống nhận diện chính xác dữ liệu, bạn nên nhập trên biểu mẫu chuẩn được định dạng sẵn của phần mềm.
+                    </p>
+                </div>
+                <button type="button" onclick="taiFileMauExcel()" class="shrink-0 bg-white border border-amber-300 text-amber-900 hover:bg-amber-100 font-semibold px-3 py-1.5 rounded-lg text-xs transition flex items-center shadow-xs">
+                    <i class="fa-solid fa-download mr-1 text-emerald-600"></i> Tải file mẫu
+                </button>
+            </div>
+
+            <!-- Bước 2: Chọn đường dẫn file -->
+            <div class="space-y-2">
+                <label class="font-bold text-gray-800 text-xs block">
+                    Bước 2: Chọn tệp nguồn dữ liệu (.xlsx, .xls) <span class="text-red-500">*</span>
+                </label>
+                
+                <div class="border-2 border-dashed border-gray-300 hover:border-emerald-600 rounded-xl p-5 text-center bg-gray-50/50 hover:bg-emerald-50/20 transition cursor-pointer" onclick="document.getElementById('input-file-import-dialog').click()">
+                    <input type="file" id="input-file-import-dialog" accept=".xlsx, .xls" class="hidden" onchange="xuLyChonFileImportDialog(event)">
+                    <i class="fa-solid fa-cloud-arrow-up text-3xl text-emerald-600 mb-2"></i>
+                    <p id="ten-file-da-chon" class="text-gray-700 font-medium text-xs">
+                        Nhấn vào đây để chọn tệp từ máy tính của bạn
+                    </p>
+                    <p class="text-[11px] text-gray-400 mt-1">Chấp nhận định dạng Microsoft Excel (.xlsx, .xls)</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-6 py-3 border-t flex justify-end space-x-2">
+            <button type="button" onclick="dongModalChonFileImport()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-xs">
+                Đóng
+            </button>
+            <button type="button" id="btn-tieptuc-import" onclick="chuyenSangXemTruoc()" class="bg-emerald-700 text-white px-5 py-2 rounded-lg font-medium text-xs hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center shadow-xs" disabled>
+                Tiếp tục: Kiểm tra dữ liệu <i class="fa-solid fa-arrow-right ml-1.5"></i>
+            </button>
+        </div>
+    </div>
+</div>

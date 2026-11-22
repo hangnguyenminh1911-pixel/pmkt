@@ -1,0 +1,130 @@
+<div id="view-chitien-tm" class="hidden space-y-4">
+    <div class="flex flex-wrap justify-between items-center bg-white p-4 rounded-lg shadow-sm border gap-3">
+        <!-- Nhóm bên trái: Các ô điều kiện lọc -->
+        <div class="flex items-center space-x-2 flex-wrap gap-2">
+            
+            <!-- Ô chọn ngày bắt đầu (Từ ngày) -->
+            <div class="flex items-center space-x-1 text-sm text-gray-600">
+                <span>Từ ngày:</span>
+                <input type="date" value="2026-10-01" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-700">
+            </div>
+            
+            <!-- Ô chọn ngày kết thúc (Đến ngày) -->
+            <div class="flex items-center space-x-1 text-sm text-gray-600">
+                <span>Đến ngày:</span>
+                <input type="date" value="2026-10-31" class="px-3 py-1.5 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-700">
+            </div>
+            
+            <!-- Ô nhập từ khóa tìm kiếm nhanh -->
+            <input type="text" placeholder="Tìm theo số chứng từ..." class="px-3 py-1.5 border rounded-lg text-sm w-60 focus:outline-none focus:ring-2 focus:ring-orange-700">
+            
+            <!-- Nút thực hiện lọc -->
+            <button class="bg-orange-900 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-orange-800 transition">Lọc</button>
+        </div>
+        
+        <!-- Nhóm bên phải: Nút thêm mới -->
+        <button type="button" onclick="moModalChungTuKhac('PC')" class="bg-green-700 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:bg-green-600 transition">
+            <i class="fa-solid fa-plus mr-1"></i> Thêm mới
+        </button>
+    </div>
+
+    <!-- Bảng danh sách phiếu chi -->
+    <div class="bg-white border rounded-lg shadow-sm overflow-visible">
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="bg-gray-50 border-b text-gray-600 text-xs uppercase tracking-wider">
+                    <!-- 1. Cột STT -->
+                    <th class="py-3 px-4 text-center w-12">STT</th>
+                    <!-- 2. Cột Số phiếu chi -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('filter-sophieuchi', event)">
+                            <span>Số phiếu chi</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="filter-sophieuchi" class="hidden absolute left-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo số phiếu:</p>
+                            <input type="text" placeholder="Nhập số phiếu..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); alert('Đã lọc số phiếu!')" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+                    <!-- 3. Cột Ngày lập -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('filter-ngaylapchi', event)">
+                            <span>Ngày lập</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="filter-ngaylapchi" class="hidden absolute left-0 top-full mt-1 w-52 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo ngày:</p>
+                            <input type="date" class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); alert('Đã lọc theo ngày!')" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- 4. Cột Người nhận tiền -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('filter-nguoinhan', event)">
+                            <span>Người nhận tiền</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="filter-nguoinhan" class="hidden absolute left-0 top-full mt-1 w-52 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo người nhận:</p>
+                            <input type="text" placeholder="Nhập tên người nhận..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); alert('Đã lọc người nhận!')" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- 5. Cột Lý do chi -->
+                    <th class="py-3 px-4 relative">
+                        <div class="flex items-center justify-between cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('filter-lydochi', event)">
+                            <span>Lý do chi</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="filter-lydochi" class="hidden absolute left-0 top-full mt-1 w-52 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo lý do:</p>
+                            <input type="text" placeholder="Nhập lý do chi..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); alert('Đã lọc lý do!')" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- 6. Cột Số tiền -->
+                    <th class="py-3 px-4 text-right relative">
+                        <div class="flex items-center justify-end space-x-2 cursor-pointer hover:text-orange-700 transition" onclick="toggleFilterMenu('filter-sotienchi', event)">
+                            <span>Số tiền</span>
+                            <i class="fa-solid fa-filter text-[10px] text-gray-400"></i>
+                        </div>
+                        <div id="filter-sotienchi" class="hidden absolute right-0 top-full mt-1 w-48 bg-white border rounded-lg shadow-xl p-3 z-50 text-gray-700 font-normal normal-case text-left">
+                            <p class="text-xs font-semibold text-gray-500 mb-1">Lọc theo số tiền:</p>
+                            <input type="number" placeholder="Nhập số tiền..." class="w-full px-2 py-1 border rounded text-xs mb-2 focus:outline-none focus:ring-1 focus:ring-orange-700">
+                            <div class="flex justify-end space-x-1">
+                                <button onclick="event.stopPropagation(); alert('Đã lọc số tiền!')" class="bg-orange-900 text-white px-2.5 py-1 rounded text-xs hover:bg-orange-800">Lọc</button>
+                            </div>
+                        </div>
+                    </th>
+
+                    <!-- 7. Cột Thao tác -->
+                    <th class="py-3 px-4 text-center">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="tbody-danh-sach-chitien" class="divide-y divide-gray-200 text-sm text-gray-700">
+                <!-- Nạp động bằng JS (js/thuchi-muahang.js) -->
+            </tbody>
+        </table>
+        <!-- DÒNG HIỂN THỊ TỔNG SỐ DÒNG (FOOTER CỦA BẢNG) -->
+        <div class="bg-gray-50 px-4 py-3 border-t flex justify-between items-center text-sm text-gray-600">
+            <div>
+                Tổng số: <span class="font-bold text-orange-900">01</span> phiếu chi
+            </div>
+            <div class="flex space-x-2 text-xs text-gray-500">
+                <span>Trang 1 / 1</span>
+            </div>
+        </div>
+    </div>
+</div>

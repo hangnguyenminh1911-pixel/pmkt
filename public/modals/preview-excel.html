@@ -1,0 +1,47 @@
+<div id="modal-preview-excel" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[80] hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-5xl overflow-hidden border flex flex-col max-h-[90vh]">
+        <!-- Header -->
+        <div class="bg-orange-950 text-white px-5 py-3.5 flex justify-between items-center shrink-0">
+            <div>
+                <h3 id="preview-excel-title" class="font-bold text-sm flex items-center">
+                    <i class="fa-solid fa-file-excel mr-2 text-emerald-400"></i> Xem trước & Kiểm tra dữ liệu nạp từ Excel
+                </h3>
+                <p id="preview-excel-subtitle" class="text-[11px] text-gray-300 mt-0.5">Kiểm tra tính hợp lệ trước khi ghi vào hệ thống</p>
+            </div>
+            <button type="button" onclick="dongModalPreviewExcel()" class="text-white/80 hover:text-white text-lg font-bold">&times;</button>
+        </div>
+
+        <!-- Thanh trạng thái tổng quan -->
+        <div class="bg-gray-50 px-5 py-2.5 border-b flex justify-between items-center text-xs shrink-0">
+            <div class="flex items-center space-x-4">
+                <span>Tổng số dòng: <b id="preview-tong-dong" class="text-gray-900">0</b></span>
+                <span class="text-emerald-700"><i class="fa-solid fa-circle-check mr-1"></i>Hợp lệ: <b id="preview-hop-le">0</b></span>
+                <span class="text-red-600"><i class="fa-solid fa-circle-xmark mr-1"></i>Lỗi: <b id="preview-so-loi">0</b></span>
+            </div>
+            <div id="preview-status-badge"></div>
+        </div>
+
+        <!-- Bảng danh sách xem trước (cuộn dọc) -->
+        <div class="p-4 overflow-auto flex-1 max-h-[60vh] border-b">
+            <table class="w-full text-left border-collapse text-xs min-w-[950px]">
+                <thead id="preview-thead" class="bg-gray-100 text-gray-700 border-b font-semibold sticky top-0 uppercase tracking-wider text-[11px] z-10 shadow-xs">
+                    <!-- Tiêu đề nạp từ JS -->
+                </thead>
+                <tbody id="preview-tbody" class="divide-y divide-gray-200">
+                    <!-- Nội dung nạp từ JS -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Footer -->
+        <div class="bg-gray-50 px-5 py-3 border-t flex justify-between items-center shrink-0">
+            <span class="text-[11px] text-gray-500 italic">* Lưu ý: Chỉ khi tất cả các dòng đều hợp lệ, nút "Xác nhận nạp dữ liệu" mới được mở khóa.</span>
+            <div class="flex space-x-2">
+                <button type="button" onclick="dongModalPreviewExcel()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-xs">Hủy bỏ</button>
+                <button type="button" id="btn-xacnhan-import" onclick="thucHienImportServer()" class="bg-emerald-700 text-white px-5 py-2 rounded-lg font-medium text-xs hover:bg-emerald-800 disabled:opacity-40 disabled:cursor-not-allowed transition flex items-center shadow-xs" disabled>
+                    <i class="fa-solid fa-cloud-arrow-up mr-1.5"></i> Xác nhận nạp dữ liệu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

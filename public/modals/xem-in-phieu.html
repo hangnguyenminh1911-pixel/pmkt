@@ -1,0 +1,37 @@
+<div id="modal-xem-in-phieu" class="fixed inset-0 bg-black/70 flex items-center justify-center z-[100] hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[95vh] flex flex-col overflow-hidden">
+        <!-- Header Thanh tác vụ -->
+        <div class="bg-orange-950 text-white px-5 py-3 flex justify-between items-center shrink-0">
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-print text-yellow-300 text-lg"></i>
+                <span class="font-bold text-sm">Xem trước biểu mẫu in</span>
+
+                <!-- NHÃN HIỂN THỊ CHẾ ĐỘ KẾ TOÁN CỐ ĐỊNH THEO DỮ LIỆU ĐÃ TẠO (KHÔNG CHO CHỌN LẠI) -->
+                <span id="badge-che-do-ke-toan" class="bg-orange-900/90 border border-orange-700/80 text-amber-200 text-xs px-2.5 py-1 rounded font-medium select-none">
+                    <i class="fa-solid fa-book-bookmark mr-1 text-amber-300"></i> Đang tải chế độ...
+                </span>
+
+                <!-- CHỈ CHO PHÉP CHỌN LOẠI BIỂU MẪU CỦA PHIẾU ĐÓ -->
+                <select id="chon-mau-in-nhanh" onchange="chuyenDoiMauIn(this.value)" class="bg-orange-900 border border-orange-700 text-white text-xs px-2.5 py-1 rounded focus:outline-none cursor-pointer font-medium">
+                    <option value="PBH">Phiếu bán hàng</option>
+                    <option value="PXK">Phiếu xuất kho</option>
+                    <option value="PTM">Phiếu thu tiền mặt</option>
+                    <option value="PNH">Phiếu thu ngân hàng</option>
+                </select>
+            </div>
+            <div class="flex items-center space-x-2">
+                <button type="button" onclick="thucHienInTrang()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold transition flex items-center shadow-xs">
+                    <i class="fa-solid fa-print mr-1.5"></i> In ngay [Ctrl+P]
+                </button>
+                <button type="button" onclick="dongModalInPhieu()" class="text-white/80 hover:text-white text-lg font-bold ml-2">&times;</button>
+            </div>
+        </div>
+
+        <!-- KHUNG HIỂN THỊ GIẤY A4 (ÁP DỤNG FONT TIMES NEW ROMAN CHUẨN BTC) -->
+<div class="p-6 overflow-y-auto flex-1 bg-gray-200 flex justify-center">
+    <div id="khung-giay-in-a4" style="font-family: 'Times New Roman', Times, serif;" class="bg-white shadow-lg p-10 w-full max-w-[820px] text-gray-950 text-[13.5px] leading-normal border">
+        <!-- Nội dung biểu mẫu -->
+    </div>
+</div>
+    </div>
+</div>

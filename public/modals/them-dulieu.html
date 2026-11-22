@@ -1,0 +1,103 @@
+<div id="modal-them-dulieu" class="fixed inset-0 bg-black/60 flex items-center justify-center z-[80] hidden">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden border flex flex-col max-h-[92vh]">
+        
+        <!-- Header -->
+        <div class="bg-orange-950 text-white px-6 py-4 flex justify-between items-center shrink-0">
+            <h3 id="modal-dulieu-title" class="font-bold text-base flex items-center">
+                <i class="fa-solid fa-database mr-2 text-emerald-400"></i> Thêm dữ liệu kế toán mới
+            </h3>
+            <button type="button" onclick="dongModalThemDuLieu()" class="text-white/80 hover:text-white text-xl font-bold">&times;</button>
+        </div>
+
+        <!-- Body Form -->
+        <div class="p-6 space-y-4 overflow-y-auto flex-1 text-xs text-gray-700">
+            
+            <div>
+                <label class="block font-bold text-gray-800 mb-1">Tên dữ liệu <span class="text-red-500">*</span></label>
+                <input type="text" id="input-ten-dulieu" placeholder="Ví dụ: KETOAN_2027" class="w-full px-3 py-2 border rounded-lg font-semibold text-orange-900 focus:outline-none focus:ring-2 focus:ring-orange-700 text-sm">
+            </div>
+
+            <div id="box-chon-nam-truoc" class="hidden bg-amber-50 p-3 rounded-lg border border-amber-200">
+                <label class="block font-bold text-amber-900 mb-1">Chọn dữ liệu nguồn năm trước để kế thừa danh mục:</label>
+                <select id="select-nguon-nam-truoc" class="w-full px-3 py-1.5 border rounded-lg bg-white font-medium focus:outline-none">
+                    <!-- Danh sách năm trước load tự động -->
+                </select>
+                <p class="text-[11px] text-amber-700 mt-1 italic">* Hệ thống sẽ tự động sao chép toàn bộ Danh mục Vật tư hàng hóa và Đối tượng từ dữ liệu nguồn sang năm mới.</p>
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-800 mb-1">Chế độ kế toán <span class="text-red-500">*</span></label>
+                <div class="space-y-1.5 pt-1">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_chedo" value="TT152" checked class="text-orange-900 focus:ring-orange-700">
+                        <span>Thông tư số 152/TT-BTC - Hộ kinh doanh, cá nhân kinh doanh</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_chedo" value="TT133" class="text-orange-900 focus:ring-orange-700">
+                        <span>Thông tư số 133/2016/TT-BTC - Chế độ kế toán doanh nghiệp nhỏ và vừa</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_chedo" value="TT99" class="text-orange-900 focus:ring-orange-700">
+                        <span>Thông tư số 99/2025/TT-BTC - Chế độ kế toán doanh nghiệp (Thay thế TT 200)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block font-bold text-gray-800 mb-1">Đồng tiền hạch toán <span class="text-red-500">*</span></label>
+                    <select class="w-full px-3 py-1.5 border rounded-lg bg-white focus:outline-none">
+                        <option value="VND">VND</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-gray-800 mb-1">Ngày bắt đầu dữ liệu <span class="text-red-500">*</span></label>
+                    <input type="date" id="input-ngay-batdau" value="2026-01-01" class="w-full px-3 py-1.5 border rounded-lg focus:outline-none">
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-800 mb-1">Phương pháp tính giá xuất kho <span class="text-red-500">*</span></label>
+                <div class="grid grid-cols-2 gap-2 pt-1">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_giatrixuat" value="BinhQuanCuoiKy" checked class="text-orange-900">
+                        <span>Bình quân cuối kỳ</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_giatrixuat" value="GiaDichDanh" class="text-orange-900">
+                        <span>Giá đích danh</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_giatrixuat" value="BinhQuanTucThoi" class="text-orange-900">
+                        <span>Bình quân tức thời</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_giatrixuat" value="NhapTruocXuatTruoc" class="text-orange-900">
+                        <span>Nhập trước xuất trước (FIFO)</span>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block font-bold text-gray-800 mb-1">Phương pháp tính thuế GTGT <span class="text-red-500">*</span></label>
+                <div class="flex space-x-6 pt-1">
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_thuegtgt" value="KhauTru" checked class="text-orange-900">
+                        <span>Phương pháp khấu trừ</span>
+                    </label>
+                    <label class="flex items-center space-x-2 cursor-pointer">
+                        <input type="radio" name="setup_thuegtgt" value="TrucTiep" class="text-orange-900">
+                        <span>Phương pháp trực tiếp trên doanh thu</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="bg-gray-50 px-6 py-3 border-t flex justify-end space-x-2 shrink-0">
+            <button type="button" onclick="dongModalThemDuLieu()" class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100 font-medium text-xs">Quay lại</button>
+            <button type="button" onclick="thucHienTaoDuLieuMoi()" class="bg-emerald-700 text-white px-5 py-2 rounded-lg font-medium text-xs hover:bg-emerald-800 transition shadow-xs">Thêm dữ liệu</button>
+        </div>
+    </div>
+</div>

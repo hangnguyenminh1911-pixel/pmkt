@@ -12,11 +12,14 @@ pmkt/
 │   ├── register.html    #   Đăng ký
 │   ├── setup.html       #   Tạo dữ liệu kế toán
 │   ├── admin.html       #   Quản trị
-│   ├── dashboard.html   #   Màn hình làm việc chính
+│   ├── dashboard.html   #   Khung màn hình chính (menu + chỗ đặt các phần bên dưới)
+│   ├── views/           #   Mỗi màn hình (view-*) một file HTML
+│   ├── modals/          #   Mỗi cửa sổ (modal) một file HTML
 │   ├── css/             #   dashboard.css, in-phieu.css
-│   └── js/              #   Mỗi nghiệp vụ một file: core, banhang, thuchi-muahang,
-│                        #   danhmuc-doituong, danhmuc-vthh, import-excel, in-phieu,
-│                        #   settings, sodu, accountManager
+│   └── js/              #   loader.js nạp views/ + modals/ rồi nạp các file nghiệp vụ:
+│                        #   core, banhang, thuchi-muahang, danhmuc-doituong,
+│                        #   danhmuc-vthh, import-excel, in-phieu, settings, sodu,
+│                        #   accountManager
 ├── src/                 # Mã nguồn phía server
 │   ├── config/          #   paths.js (đường dẫn), env.js (đọc .env), mail.js (gửi email)
 │   ├── routes/          #   apiRouter, authRouter, adminRouter
@@ -46,3 +49,11 @@ Mở trình duyệt: http://localhost:3000 (đăng nhập) hoặc http://localho
 - Sao lưu dữ liệu: chép cả thư mục `data/` ra nơi khác.
 - Người dùng ngoài không tải được `data/`, `src/`, `server.js` qua trình duyệt nữa:
   server chỉ phát thư mục `public/`.
+
+## Thêm màn hình / cửa sổ mới trong dashboard
+
+1. Tạo file `public/views/<ten>.html` (hoặc `public/modals/<ten>.html`) — chỉ HTML, không `<script>`.
+2. Đặt `<div data-partial="views/<ten>.html"></div>` vào đúng vị trí trong `dashboard.html`.
+3. Mã JS cần chạy khi trang mở: dùng `khiGiaoDienSanSang(() => { ... })` thay cho
+   `DOMContentLoaded` (các phần HTML được nạp sau sự kiện này). File JS mới thì thêm
+   vào danh sách `DANH_SACH_JS` trong `public/js/loader.js`.
