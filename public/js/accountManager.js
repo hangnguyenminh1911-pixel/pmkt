@@ -114,6 +114,34 @@ function renderBangNganHang(danhSach) {
     });
 }
 
+// 4b. Tải danh sách tài khoản ngân hàng công ty từ Server rồi vẽ ra bảng
+async function taiDanhSachNganHang() {
+    const tbody = document.getElementById('tbody-danhmuc-nganhang');
+    try {
+        const res = await fetch('/api/danh-sach-ngan-hang', { cache: 'no-store' });
+        const result = await res.json();
+        if (!result.success) throw new Error(result.message || 'Máy chủ trả về lỗi');
+        window.danhSachNganHangServer = result.data || [];
+        renderBangNganHang(window.danhSachNganHangServer);
+    } catch (e) {
+        console.error("Lỗi tải danh sách ngân hàng:", e);
+        if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="py-6 text-center text-red-500 italic">Không tải được danh sách tài khoản ngân hàng. Vui lòng thử lại.</td></tr>`;
+    }
+}
+
+// 4c. Xóa tài khoản ngân hàng (nút [Xóa] trên bảng)
+async function xoaTaiKhoanNH(stk) {
+    if (!confirm(`Bạn có chắc chắn muốn xóa tài khoản ngân hàng ${stk}?`)) return;
+    try {
+        const res = await fetch(`/api/xoa-ngan-hang/${encodeURIComponent(stk)}`, { method: 'DELETE' });
+        const result = await res.json();
+        alert(result.message || (result.success ? "Đã xóa!" : "Xóa không thành công!"));
+        if (result.success) taiDanhSachNganHang();
+    } catch (e) {
+        alert("Lỗi kết nối máy chủ!");
+    }
+}
+
 // 5. Tải danh mục hệ thống tài khoản kế toán từ Server
 async function taiHeThongTaiKhoan() {
     try {
