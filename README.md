@@ -30,7 +30,7 @@ pmkt/
 
 ```bash
 npm install          # cài thư viện (lần đầu hoặc sau khi đổi nhánh)
-copy .env.example .env   # Windows (Linux/macOS: cp .env.example .env) rồi điền SMTP_USER, SMTP_PASS
+copy .env.example .env   # Windows (Linux/macOS: cp .env.example .env) rồi điền SMTP_*, SUPERADMIN_*
 npm start            # chạy server
 ```
 
@@ -41,6 +41,8 @@ Mở trình duyệt: http://localhost:3000 (đăng nhập) hoặc http://localho
 - Khi khởi động, nếu `data/` chưa có file nào thì server tự chép từ `data-mau/` sang.
   File đã có trong `data/` **không bao giờ bị ghi đè**.
 - Tài khoản mẫu trong `data-mau/users.json`: MST `0200123456`, tên đăng nhập `admin`, mật khẩu `Demo@123`.
+- Mật khẩu người dùng được lưu dạng mã hóa bcrypt. Mật khẩu cũ dạng chữ thường tự được mã hóa khi khởi động (mật khẩu đăng nhập không đổi).
+- Tài khoản Quản trị hệ thống cấu hình trong `.env` (`SUPERADMIN_MST`, `SUPERADMIN_USERNAME`, `SUPERADMIN_PASSWORD_HASH`); chưa cấu hình thì bị tắt.
 - Sao lưu dữ liệu: chép cả thư mục `data/` ra nơi khác.
 - Người dùng ngoài không tải được `data/`, `src/`, `server.js` qua trình duyệt nữa:
   server chỉ phát thư mục `public/`.

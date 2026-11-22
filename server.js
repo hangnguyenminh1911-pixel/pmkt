@@ -8,6 +8,8 @@ const app = express();
 
 // Tạo data/ và chép dữ liệu mẫu (data-mau/) cho các file còn thiếu - không ghi đè dữ liệu thật
 khoiTaoDuLieu();
+// Mã hóa (bcrypt) các mật khẩu cũ còn lưu dạng chữ thường trong data/users.json - mật khẩu đăng nhập không đổi
+require('./src/utils/matKhau').maHoaMatKhauCu(path.join(DATA_DIR, 'users.json'));
 
 // Chứng từ dùng chung kho data/vouchers.json; khách hàng & hàng hóa dùng data/ (cùng file với src/services)
 const DATA_FILE = path.join(DATA_DIR, 'vouchers.json');

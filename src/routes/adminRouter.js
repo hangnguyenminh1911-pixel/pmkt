@@ -25,7 +25,7 @@ router.get('/api/admin/customers', (req, res) => {
 // 3. API phê duyệt và cấp tài khoản (Viết thoáng để không bị lỗi 400 Bad Request)
 router.post('/api/admin/approve-request', async (req, res) => {
     try {
-        console.log("Body nhận được từ client:", req.body); // In ra xem có nhận được requestId không
+        console.log("Yêu cầu cấp tài khoản cho:", req.body && req.body.requestId);
         const { requestId, goiCuoc, password } = req.body;
 
         const result = await adminService.pheDuyetVaCapTaiKhoan(requestId, goiCuoc, password);
@@ -36,13 +36,13 @@ router.post('/api/admin/approve-request', async (req, res) => {
 });
 
 // 4. API thêm mới hoặc cập nhật thông tin khách hàng từ trang Admin
-router.post('/api/admin/save-customer', (req, res) => {
+router.post('/api/admin/save-customer', async (req, res) => {
     try {
         const customerData = req.body;
         if (!customerData.mst || !customerData.tenDoanhNghiep) {
             return res.status(400).json({ success: false, message: 'Mã số thuế và Tên doanh nghiệp là bắt buộc!' });
         }
-        const result = adminService.luuKhachHang(customerData);
+        const result = await adminService.luuKhachHang(customerData);
         res.json(result);
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });

@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const bcrypt = require('bcrypt'); // Thư viện mã hóa mật khẩu
+const { maHoaMatKhau, kiemTraMatKhau } = require('../utils/matKhau');
+const env = require('../config/env');
 
 // Gửi email: cấu hình tài khoản SMTP trong file .env (xem .env.example)
 const { transporter, MAIL_FROM } = require('../config/mail');
@@ -37,9 +38,7 @@ function ghiDanhSachRequests(data) {
 function docDanhSachUsers() {
     try {
         if (!fs.existsSync(USERS_FILE)) {
-            fs.writeFileSync(USERS_FILE, JSON.stringify([
-                { username: "admin", password: "123456", role: "admin" }
-            ], null, 2));
+            fs.writeFileSync(USERS_FILE, JSON.stringify([], null, 2));
         }
         return JSON.parse(fs.readFileSync(USERS_FILE, 'utf-8') || '[]');
     } catch (e) {
@@ -61,20 +60,30 @@ async function xuLyDangNhap(mst, username, password) {
     const cleanUser = String(username || '').trim();
     const cleanPass = String(password || '').trim();
 
-    // Kiểm tra tài khoản Quản trị hệ thống cứng (nếu có)
-    if (cleanMst === 'admin' && cleanUser === 'admin' && cleanPass === 'Bizmate@2026') {
+    // Tài khoản Quản trị hệ thống: cấu hình trong file .env (SUPERADMIN_*), không ghi trong mã nguồn
+    if (await laSuperAdmin(cleanMst, cleanUser, cleanPass)) {
         return { role: 'super_admin', tenDoanhNghiep: 'Super Admin System' };
     }
 
-    // Dò tìm trong danh sách khách hàng chính thức
+    // Dò tìm trong danh sách khách hàng chính thức (theo MST + tên đăng nhập), rồi kiểm tra mật khẩu
     const foundUser = users.find(u => 
         String(u.mst || '').trim() === cleanMst && 
-        String(u.username || '').trim() === cleanUser && 
-        String(u.password || '').trim() === cleanPass
+        String(u.username || '').trim() === cleanUser
     );
 
     if (!foundUser) {
         return null;
+    }
+
+    const ketQua = await kiemTraMatKhau(cleanPass, foundUser.password);
+    if (!ketQua.dung) {
+        return null;
+    }
+
+    // Mật khẩu cũ còn lưu dạng chữ thường -> mã hóa lại ngay sau khi đăng nhập đúng
+    if (ketQua.canNangCap) {
+        foundUser.password = await maHoaMatKhau(cleanPass);
+        writeJsonFile(USERS_FILE, users);
     }
 
     // Kiểm tra trạng thái tài khoản bị khóa
@@ -89,6 +98,17 @@ async function xuLyDangNhap(mst, username, password) {
         role: 'customer'
     };
 }
+// Kiểm tra đăng nhập Quản trị hệ thống từ cấu hình .env
+// SUPERADMIN_PASSWORD_HASH (bcrypt) được ưu tiên; nếu không có thì dùng SUPERADMIN_PASSWORD
+async function laSuperAdmin(mst, username, password) {
+    if (!env.SUPERADMIN_ENABLED) return false;
+    if (mst !== env.SUPERADMIN_MST || username !== env.SUPERADMIN_USERNAME) return false;
+    if (env.SUPERADMIN_PASSWORD_HASH) {
+        return (await kiemTraMatKhau(password, env.SUPERADMIN_PASSWORD_HASH)).dung;
+    }
+    return password === env.SUPERADMIN_PASSWORD;
+}
+
 // Hàm đọc file JSON an toàn
 function readJsonFile(filePath) {
     if (!fs.existsSync(filePath)) return [];
@@ -117,10 +137,7 @@ async function xuLyQuenMatKhau(mst, username) {
 
     // Sinh mật khẩu mới ngẫu nhiên
     const newPassword = 'Bizmate@' + Math.floor(1000 + Math.random() * 9000);
-    users[userIndex].password = newPassword;
-
-    // Lưu lại vào users.json
-    writeJsonFile(USERS_FILE, users);
+    const newPasswordHash = await maHoaMatKhau(newPassword); // Chỉ lưu bản mã hóa, email gửi bản gốc
 
     const targetUser = users[userIndex];
 
@@ -154,10 +171,13 @@ async function xuLyQuenMatKhau(mst, username) {
 
     try {
         await transporter.sendMail(mailOptions);
+        // Chỉ đổi mật khẩu sau khi đã gửi email thành công (tránh khóa người dùng khi lỗi SMTP)
+        users[userIndex].password = newPasswordHash;
+        writeJsonFile(USERS_FILE, users);
         return { success: true, message: `Mật khẩu mới đã được tự động cấp và gửi thành công đến email: ${targetUser.email}!` };
     } catch (error) {
         console.error("Lỗi gửi email reset mật khẩu:", error);
-        return { success: false, message: "Đã tạo mật khẩu mới nhưng việc gửi email thông báo thất bại do cấu hình SMTP!" };
+        return { success: false, message: "Không gửi được email do cấu hình SMTP, mật khẩu hiện tại được giữ nguyên. Vui lòng liên hệ quản trị viên!" };
     }
 }
 
@@ -256,8 +276,7 @@ async function pheDuyetYeuCau(requestId) {
         finalUsername = username + Math.floor(10 + Math.random() * 90);
     }
 
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(rawPassword, saltRounds);
+    const hashedPassword = await maHoaMatKhau(rawPassword);
 
     users.push({
         username: finalUsername,

@@ -29,6 +29,12 @@ function writeJsonFile(filePath, data) {
 
 // Gửi email: cấu hình tài khoản SMTP trong file .env (xem .env.example)
 const { transporter, MAIL_FROM } = require('../config/mail');
+const { maHoaMatKhau, boMatKhau } = require('../utils/matKhau');
+
+// Sinh mật khẩu tạm ngẫu nhiên dạng Bizmate@1234
+function sinhMatKhauTam() {
+    return 'Bizmate@' + Math.floor(1000 + Math.random() * 9000);
+}
 
 const adminService = {
     // 1. Lấy danh sách yêu cầu đăng ký đang chờ
@@ -38,12 +44,16 @@ const adminService = {
 
     // 2. Lấy danh sách khách hàng đang hoạt động
     layDanhSachKhachHang: () => {
-        return readJsonFile(USERS_FILE);
+        // Không bao giờ gửi mật khẩu (kể cả bản mã hóa) về trình duyệt
+        return readJsonFile(USERS_FILE).map(boMatKhau);
     },
 
     // --- CẬP NHẬT HÀM LƯU / THÊM MỚI KHÁCH HÀNG (CHẶN TRÙNG MST) ---
     // --- HÀM LƯU / THÊM MỚI & SỬA KHÁCH HÀNG (PHÂN BIỆT THÊM MỚI VÀ CHỈNH SỬA) ---
-    luuKhachHang: (khData) => {
+    luuKhachHang: async (khData) => {
+        // Mật khẩu chỉ lưu dạng mã hóa; để trống khi sửa = giữ nguyên mật khẩu cũ
+        const matKhauMoi = String(khData.password || '').trim();
+        const matKhauMaHoa = matKhauMoi ? await maHoaMatKhau(matKhauMoi) : null;
         let users = readJsonFile(USERS_FILE);
         const mstMoi = String(khData.mst || '').trim();
         const originalMst = String(khData.originalMst || '').trim();
@@ -69,7 +79,7 @@ const adminService = {
                     tenDoanhNghiep: khData.tenDoanhNghiep,
                     goiCuoc: khData.goiCuoc,
                     trangThai: khData.trangThai || users[existingUserIndex].trangThai,
-                    password: khData.password || users[existingUserIndex].password
+                    password: matKhauMaHoa || users[existingUserIndex].password
                 };
                 writeJsonFile(USERS_FILE, users);
                 return { success: true, message: 'Cập nhật thông tin khách hàng thành công!' };
@@ -95,14 +105,15 @@ const adminService = {
                     tenDoanhNghiep: khData.tenDoanhNghiep,
                     goiCuoc: khData.goiCuoc,
                     trangThai: khData.trangThai || users[oldIndex].trangThai,
-                    password: khData.password || users[oldIndex].password
+                    password: matKhauMaHoa || users[oldIndex].password
                 };
                 writeJsonFile(USERS_FILE, users);
                 return { success: true, message: 'Cập nhật thông tin và mã số thuế thành công!' };
             }
         }
 
-        // 3. Nếu là thêm mới hoàn toàn
+        // 3. Nếu là thêm mới hoàn toàn (không nhập mật khẩu -> sinh mật khẩu tạm ngẫu nhiên)
+        const matKhauTam = matKhauMoi ? null : sinhMatKhauTam();
         const newCustomer = {
             ngayDangKy: khData.ngayDangKy || new Date().toISOString().split('T')[0],
             hoTen: khData.hoTen || 'Khách hàng',
@@ -113,12 +124,17 @@ const adminService = {
             tenDoanhNghiep: khData.tenDoanhNghiep,
             goiCuoc: khData.goiCuoc || 'Gói chuẩn',
             trangThai: khData.trangThai || 'Đang hoạt động',
-            password: khData.password || 'Bizmate@2026'
+            password: matKhauMaHoa || await maHoaMatKhau(matKhauTam)
         };
         users.unshift(newCustomer);
 
         writeJsonFile(USERS_FILE, users);
-        return { success: true, message: 'Thêm mới khách hàng thành công!' };
+        return {
+            success: true,
+            message: matKhauTam
+                ? `Thêm mới khách hàng thành công! Mật khẩu tạm (chỉ hiển thị lần này): ${matKhauTam}`
+                : 'Thêm mới khách hàng thành công!'
+        };
     },
 
         // 3. Phê duyệt yêu cầu và cấp tài khoản (Đã tích hợp cơ chế tự động dọn dẹp yêu cầu trùng MST)
@@ -154,7 +170,8 @@ const adminService = {
         }
 
         // Sinh mật khẩu ngẫu nhiên hoàn toàn mới và cố định tên đăng nhập là admin
-        const randomPassword = 'Bizmate@' + Math.floor(1000 + Math.random() * 9000);
+        const randomPassword = sinhMatKhauTam();
+        const randomPasswordHash = await maHoaMatKhau(randomPassword); // Lưu bản mã hóa, email gửi bản gốc
         const usernameMacDinh = 'admin';
 
         let existingUser = users.find(u => String(u.mst).trim() === String(targetMst).trim());
@@ -169,7 +186,7 @@ const adminService = {
                 tenDoanhNghiep: reqItem.tenDoanhNghiep || reqItem.donVi || 'Doanh nghiệp',
                 goiCuoc: goiCuoc || reqItem.goiCuoc || reqItem.goiDangKy || 'Gói chuẩn',
                 trangThai: 'Đang hoạt động',
-                password: randomPassword
+                password: randomPasswordHash
             };
             users.unshift(newUser);
             reqItem = newUser;
@@ -177,7 +194,7 @@ const adminService = {
             existingUser.trangThai = 'Đang hoạt động';
             existingUser.username = usernameMacDinh;
             existingUser.goiCuoc = goiCuoc || existingUser.goiCuoc;
-            existingUser.password = randomPassword;
+            existingUser.password = randomPasswordHash;
             reqItem = existingUser;
         }
 
@@ -218,7 +235,8 @@ const adminService = {
             return { success: true, message: 'Đã kích hoạt tài khoản, dọn dẹp các yêu cầu trùng lặp và gửi email thành công!' };
         } catch (error) {
             console.error("Lỗi gửi email thực tế:", error);
-            return { success: false, message: 'Kích hoạt tài khoản thành công nhưng gửi email thất bại do cấu hình SMTP!' };
+            // Mật khẩu chỉ còn lưu bản mã hóa -> báo mật khẩu tạm cho quản trị viên (chỉ lần này) để gửi khách thủ công
+            return { success: false, message: `Kích hoạt tài khoản thành công nhưng gửi email thất bại do cấu hình SMTP! Tên đăng nhập: ${reqItem.username} - Mật khẩu tạm (chỉ hiển thị lần này): ${randomPassword}` };
         }
     },
 // 5. Xóa khách hàng theo MST

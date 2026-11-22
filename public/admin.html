@@ -279,7 +279,7 @@
         ];
 
         let danhSachKhachHangTongHop = JSON.parse(localStorage.getItem('bizmate_khachhang')) || [
-            { ngayDangKy: "2026-11-04", hoTen: "Nguyễn Văn A", sdt: "0901234567", email: "hangnguyenminh1911@gmail.com", mst: "0200638946", tenDoanhNghiep: "Công ty TNHH Mẫu", goiCuoc: "Gói chuẩn", trangThai: "Chờ kích hoạt", password: "Bizmate@2026" }
+            { ngayDangKy: "2026-11-04", hoTen: "Nguyễn Văn A", sdt: "0901234567", email: "hangnguyenminh1911@gmail.com", mst: "0200638946", tenDoanhNghiep: "Công ty TNHH Mẫu", goiCuoc: "Gói chuẩn", trangThai: "Chờ kích hoạt" }
         ];
 
         function luuLocalData() {
@@ -355,7 +355,6 @@
                 // Đổi trạng thái từ "cho_duyet" sang "Chờ kích hoạt" để khớp với bộ lọc giao diện
                 trangThai: (req.trangThai === 'cho_duyet' || req.trangThai === 'Chờ kích hoạt') ? 'Chờ kích hoạt' : req.trangThai,
                 
-                password: req.password || 'Bizmate@2026'
             }));
 
             danhSachTong = [...dsChoDuyet, ...danhSachTong];
@@ -491,8 +490,7 @@ function hienThiDanhSachKhachHang() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ 
                 requestId: item.mst, // Gửi Mã số thuế (ví dụ: '012345678')
-                goiCuoc: item.goiCuoc, 
-                password: item.password || 'Bizmate@2026' 
+                goiCuoc: item.goiCuoc
             })
         });
 
@@ -517,7 +515,9 @@ function hienThiDanhSachKhachHang() {
             document.getElementById('kh-email').value = '';
             document.getElementById('kh-mst').value = '';
             document.getElementById('kh-tendn').value = '';
-            document.getElementById('kh-pass').value = 'Bizmate@2026';
+            // Mật khẩu tạm ngẫu nhiên cho khách hàng mới (quản trị viên ghi lại để gửi khách)
+            document.getElementById('kh-pass').value = 'Bizmate@' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('kh-pass').placeholder = 'Tự động sinh ngẫu nhiên nếu để trống...';
             document.getElementById('kh-trangthai').value = 'Đang hoạt động';
             
             capNhatDropdownGoiCước();
@@ -539,7 +539,9 @@ function hienThiDanhSachKhachHang() {
             // HỨNG DỮ LIỆU TÊN ĐƠN VỊ CHUẨN XÁC, TRÁNH BỊ DÍNH CHỮ
             document.getElementById('kh-tendn').value = item.tenDoanhNghiep || item.tenDonVi || item.ten || '';
             
-            document.getElementById('kh-pass').value = item.password && item.password !== 'Bizmate@2026' ? item.password : ('Bizmate@' + Math.floor(1000 + Math.random() * 9000));
+            // Không hiển thị mật khẩu cũ (server không gửi về). Để trống = giữ nguyên mật khẩu hiện tại
+            document.getElementById('kh-pass').value = '';
+            document.getElementById('kh-pass').placeholder = 'Để trống nếu giữ nguyên mật khẩu, nhập để đặt mật khẩu mới...';
             document.getElementById('kh-trangthai').value = item.trangThai || 'Chờ kích hoạt';
             
             capNhatDropdownGoiCước();
