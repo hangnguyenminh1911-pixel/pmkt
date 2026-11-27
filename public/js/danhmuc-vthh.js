@@ -1,10 +1,20 @@
+// Giữ tên cũ để tương thích; dùng hàm escapeHtml() chung trong core.js
 function escapeHtmlVTHH(str) {
-    return String(str ?? '')
-        .replace(/&/g, '&')
-        .replace(/</g, '<')
-        .replace(/>/g, '>')
-        .replace(/"/g, '"')
-        .replace(/'/g, ''');
+    return escapeHtml(str);
+}
+
+// Xác định dòng chứng từ sẽ nhận hàng hóa sau khi Thêm/Sửa.
+// - Mở từ nút trên một dòng chứng từ: gắn với dòng đó.
+// - Mở từ màn Danh mục (dòng cũ đã bị ẩn/xóa): bỏ liên kết để không ghi đè nhầm dòng cũ.
+function datDongNhanHangHoa(btn) {
+    if (typeof dongDangChonHangHoa === 'undefined') return;
+    if (btn) {
+        dongDangChonHangHoa = btn.closest('.item-row');
+        return;
+    }
+    if (!dongDangChonHangHoa || !dongDangChonHangHoa.isConnected || dongDangChonHangHoa.closest('.hidden')) {
+        dongDangChonHangHoa = null;
+    }
 }
 
 // 8. Thêm nhanh hàng hóa mới vào server (Phím tắt F6)
@@ -27,7 +37,10 @@ async function themNhanhHangHoa() {
         if (res.ok && data.success) {
             alert("Thêm hàng hóa mới thành công!");
             if (typeof taiDanhSachHangHoa === 'function') await taiDanhSachHangHoa();
-            if (typeof chonHangHoaTuBang === 'function') chonHangHoaTuBang({ ma, ten, dvt, ton, giaBan });
+            datDongNhanHangHoa(null);
+            if (typeof dongDangChonHangHoa !== 'undefined' && dongDangChonHangHoa && typeof chonHangHoaTuBang === 'function') {
+                chonHangHoaTuBang({ ma: ma.trim().toUpperCase(), ten, dvt, ton, giaBan });
+            }
             hienThiDanhSachVTHH();
         } else {
             alert(data.message || "Lỗi thêm hàng!");
@@ -133,10 +146,6 @@ function capNhatMoTaQuyDoi() {
     tuDongTinhMoTa(null);
 }
 
-document.getElementById('quick-dvt-hh')?.addEventListener('input', () => {
-    tuDongTinhMoTa(null);
-});
-
 let dangSuaMaHangHoa = null;
 
 function moModalThemHH(btn) {
@@ -167,9 +176,7 @@ function moModalThemHH(btn) {
     const tbodyQD = document.getElementById('tbody-don-vi-chuyen-doi');
     if (tbodyQD) tbodyQD.innerHTML = "";
 
-    if (typeof dongDangChonHangHoa !== 'undefined' && btn) {
-        dongDangChonHangHoa = btn.closest('.item-row');
-    }
+    datDongNhanHangHoa(btn);
     const boxHH = document.getElementById('dropdown-table-hh');
     if (boxHH) boxHH.classList.add('hidden');
 
@@ -244,6 +251,7 @@ function moModalSuaHH(maHang) {
     }
 
     dangSuaMaHangHoa = maHang;
+    datDongNhanHangHoa(null);
 
     const modalTitle = document.querySelector('#modal-them-hang-hoa h3');
     if (modalTitle) modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square mr-2"></i>Sửa thông tin Vật tư, Hàng hóa: ${escapeHtmlVTHH(hh.ma)}`;
@@ -362,7 +370,7 @@ function hienThiDanhSachVTHH(danhSachTuyChon = null) {
         const tcKey = item.tinhChat || "hanghoa";
         const tcInfo = mapTinhChat[tcKey] || { ten: "Hàng hóa", color: "bg-blue-100 text-blue-800" };
         const maSafe = escapeHtmlVTHH(item.ma);
-        const maEnc = encodeURIComponent(String(item.ma ?? ''));
+        const maEnc = maHoaThamSoOnclick(item.ma);
 
         const tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50";

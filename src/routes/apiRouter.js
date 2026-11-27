@@ -29,6 +29,17 @@ router.post('/api/them-hang-hoa', (req, res) => {
     }
 });
 
+// API: Cập nhật (sửa) hàng hóa — trả về kèm danh sách mới như route cũ trong server.js
+router.post('/api/cap-nhat-hang-hoa', (req, res) => {
+    try {
+        const result = productService.capNhatHangHoa(req.body);
+        return res.json({ ...result, data: productService.layDanhSachHangHoa() });
+    } catch (e) {
+        const status = /Không tìm thấy/.test(e.message) ? 404 : 400;
+        return res.status(status).json({ success: false, message: e.message });
+    }
+});
+
 // API: Xóa một hàng hóa theo mã
 router.delete('/api/xoa-hang-hoa/:ma', (req, res) => {
     try {
@@ -212,7 +223,8 @@ router.post('/api/sua-ngan-hang', (req, res) => {
 // 5. Lấy hệ thống tài khoản kế toán
 router.get('/api/he-thong-tai-khoan', (req, res) => {
     try {
-        res.json({ success: true, data: accountService.layHeThongTaiKhoan() });
+        // Ưu tiên chế độ kế toán trình duyệt gửi lên (?cheDo=TT133...), không hợp lệ thì dùng chế độ của CSDL đang làm việc
+        res.json({ success: true, data: accountService.layHeThongTaiKhoan(req.query.cheDo) });
     } catch (e) {
         res.status(500).json({ success: false, message: e.message });
     }

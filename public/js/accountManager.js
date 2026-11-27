@@ -5,14 +5,7 @@
 window.danhSachNganHangServer = [];
 window.heThongTaiKhoanServer = [];
 
-function escapeHtml(str) {
-    return String(str ?? '')
-        .replace(/&/g, '&')
-        .replace(/</g, '<')
-        .replace(/>/g, '>')
-        .replace(/"/g, '"')
-        .replace(/'/g, ''');
-}
+// escapeHtml() và maHoaThamSoOnclick() nằm trong core.js (dùng chung)
 
 // 1. Mở modal thêm mới tài khoản ngân hàng
 function moModalThemNganHang() {
@@ -106,7 +99,7 @@ function renderBangNganHang(danhSach) {
 
     danhSach.forEach((item, index) => {
         const stkSafe = escapeHtml(item.stk);
-        const stkJs = encodeURIComponent(String(item.stk ?? ''));
+        const stkJs = maHoaThamSoOnclick(item.stk);
         const tr = document.createElement('tr');
         tr.className = "hover:bg-gray-50";
         tr.innerHTML = `

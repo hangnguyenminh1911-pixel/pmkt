@@ -154,21 +154,7 @@ app.delete('/api/xoa-chung-tu/:soChungTu', (req, res) => {
     res.json({ success: true, message: `Đã xóa chứng từ ${soCT}!` });
 });
 
-// API Cập nhật/Sửa thông tin hàng hóa
-app.post('/api/cap-nhat-hang-hoa', (req, res) => {
-    const updatedHH = req.body;
-    if (!updatedHH || !updatedHH.ma) {
-        return res.status(400).json({ success: false, message: "Thiếu mã hàng hóa cần sửa!" });
-    }
-    let list = docDanhSachHH();
-    const index = list.findIndex(i => i.ma === updatedHH.ma);
-    if (index === -1) {
-        return res.status(404).json({ success: false, message: "Không tìm thấy hàng hóa để sửa!" });
-    }
-    list[index] = { ...list[index], ...updatedHH };
-    ghiDanhSachHH(list);
-    res.json({ success: true, message: "Cập nhật hàng hóa thành công!", data: list });
-});
+// (API /api/cap-nhat-hang-hoa đã chuyển sang src/routes/apiRouter.js, dùng productService.capNhatHangHoa)
 
 // API Cập nhật/Sửa thông tin đối tượng (Khách hàng / NCC)
 app.post('/api/cap-nhat-doi-tuong', (req, res) => {

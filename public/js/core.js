@@ -1,3 +1,23 @@
+// ==============================================================
+// TIỆN ÍCH DÙNG CHUNG CHO MỌI MODULE (core.js được nạp đầu tiên)
+// ==============================================================
+
+// Chuyển ký tự đặc biệt thành thực thể HTML để chèn dữ liệu vào innerHTML / thuộc tính an toàn
+function escapeHtml(str) {
+    return String(str ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+}
+
+// Mã hóa giá trị để đặt trong onclick="ham(decodeURIComponent('...'))".
+// encodeURIComponent không mã hóa dấu nháy đơn nên phải tự thay bằng %27.
+function maHoaThamSoOnclick(str) {
+    return encodeURIComponent(String(str ?? '')).replace(/'/g, '%27');
+}
+
         function toggleMenu(menuId) {
             const menu = document.getElementById(menuId);
             const icon = document.getElementById('icon-' + menuId);
