@@ -2,7 +2,21 @@
 // LOGIC XỬ LÝ PHÂN HỆ CẤU HÌNH HỆ THỐNG & QUẢN LÝ DỮ LIỆU (SETTINGS.JS)
 // ==============================================================
 
-// Biến toàn cục lưu trữ toàn bộ cấu hình tải từ Server
+const CHE_DO_KETOAN_MAP = {
+    TT152: {
+        ngan: 'Thông tư 152 (Hộ KD)',
+        dayDu: 'Thông tư số 152/2025/TT-BTC (Hộ kinh doanh, cá nhân kinh doanh)'
+    },
+    TT133: {
+        ngan: 'Thông tư 133 (DNNVV)',
+        dayDu: 'Thông tư số 133/2016/TT-BTC (Doanh nghiệp nhỏ và vừa)'
+    },
+    TT99: {
+        ngan: 'Thông tư 99 (Doanh nghiệp)',
+        dayDu: 'Thông tư số 99/2025/TT-BTC (Chế độ kế toán doanh nghiệp)'
+    }
+};
+
 window.serverCauHinhCache = {
     dinhDang: {},
     doanhNghiep: {},
@@ -11,13 +25,49 @@ window.serverCauHinhCache = {
     databases: []
 };
 
+function layDanhSachDatabase() {
+    let dbs = window.serverCauHinhCache.databases;
+    if (!dbs || !Array.isArray(dbs) || dbs.length === 0) {
+        dbs = [
+            { id: "db_2026", ten: "KETOAN_2026", ngayTao: "01/01/2026", cheDo: "TT152", dangLamViec: true }
+        ];
+    }
+    return dbs;
+}
+
+function layDatabaseHienTai() {
+    const dbs = layDanhSachDatabase();
+    return dbs.find(db => db.dangLamViec) || dbs[0];
+}
+
+function dongBoCheDoTuServer() {
+    const dbHienTai = layDatabaseHienTai();
+    const cheDoChuan = dbHienTai?.cheDo || 'TT152';
+    localStorage.setItem('BIZMATE_CHEDO_KETOAN', cheDoChuan);
+    return cheDoChuan;
+}
+
+async function guiLuuCauHinh(loai, data) {
+    const res = await fetch('/api/cau-hinh/luu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ loai, data })
+    });
+    const result = await res.json();
+    if (!res.ok || !result.success) {
+        throw new Error(result.message || 'Lỗi khi lưu cấu hình lên server!');
+    }
+    return result;
+}
+
 // 1. Tải toàn bộ cấu hình từ Server khi mở tab Cấu hình
 async function taiCauHinhTuServer() {
     try {
         const res = await fetch('/api/cau-hinh');
         const result = await res.json();
-        if (result.success) {
+        if (res.ok && result.success) {
             window.serverCauHinhCache = result.data;
+            dongBoCheDoTuServer();
         }
     } catch (e) {
         console.error("Lỗi kết nối tải cấu hình từ server:", e);
@@ -36,7 +86,6 @@ async function chuyenTabCauHinh(tab) {
 
     if (!subDulieu || !subThongtin || !subTuychon) return;
 
-    // Ẩn tất cả
     subDulieu.classList.add('hidden');
     subThongtin.classList.add('hidden');
     subTuychon.classList.add('hidden');
@@ -45,7 +94,6 @@ async function chuyenTabCauHinh(tab) {
     if (btnThongtin) btnThongtin.className = "text-gray-500 hover:text-gray-800 pb-1 px-1 transition";
     if (btnTuychon) btnTuychon.className = "text-gray-500 hover:text-gray-800 pb-1 px-1 transition";
 
-    // Đồng bộ tải dữ liệu mới nhất từ server trước khi render
     await taiCauHinhTuServer();
 
     if (tab === 'dulieu') {
@@ -76,24 +124,15 @@ async function luuTuyChonDinhDang() {
     };
 
     try {
-        const res = await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'dinhDang', data: cauHinhFormat })
-        });
-        const result = await res.json();
-        if (result.success) {
-            alert("Đã lưu tùy chọn định dạng lên server thành công!");
-        } else {
-            alert(result.message || "Lỗi khi lưu cấu hình định dạng!");
-        }
+        await guiLuuCauHinh('dinhDang', cauHinhFormat);
+        window.serverCauHinhCache.dinhDang = cauHinhFormat;
+        alert("Đã lưu tùy chọn định dạng lên server thành công!");
     } catch (e) {
         console.error(e);
-        alert("Lỗi kết nối máy chủ khi lưu định dạng!");
+        alert(e.message || "Lỗi kết nối máy chủ khi lưu định dạng!");
     }
 }
 
-// Nạp cấu hình định dạng khi mở tab
 function napTuyChonDinhDang() {
     const data = window.serverCauHinhCache.dinhDang || {};
     if (document.getElementById('opt-dongtien')) document.getElementById('opt-dongtien').value = data.dongTien || 'VND';
@@ -103,17 +142,6 @@ function napTuyChonDinhDang() {
     if (document.getElementById('opt-dec-tygia')) document.getElementById('opt-dec-tygia').value = data.decTyGia || '2';
 }
 
-// 2. Quản lý danh sách cơ sở dữ liệu / kỳ kế toán từ Server
-function layDanhSachDatabase() {
-    let dbs = window.serverCauHinhCache.databases;
-    if (!dbs || !Array.isArray(dbs) || dbs.length === 0) {
-        dbs = [
-            { id: "db_2026", ten: "KETOAN_2026", ngayTao: "01/01/2026", cheDo: "TT152", dangLamViec: true }
-        ];
-    }
-    return dbs;
-}
-
 // Render danh sách cơ sở dữ liệu dạng thẻ card
 function renderDanhSachDatabase() {
     const container = document.getElementById('grid-danh-sach-dulieu');
@@ -121,15 +149,23 @@ function renderDanhSachDatabase() {
     container.innerHTML = "";
 
     const dbs = layDanhSachDatabase();
+    const tenGiaXuatMap = {
+        BinhQuanCuoiKy: 'Bình quân cuối kỳ',
+        GiaDichDanh: 'Giá đích danh',
+        BinhQuanTucThoi: 'Bình quân tức thời',
+        NhapTruocXuatTruoc: 'FIFO (Nhập trước xuất trước)'
+    };
+    const tenThueMap = {
+        KhauTru: 'Phương pháp khấu trừ',
+        TrucTiep: 'Trực tiếp trên doanh thu'
+    };
 
     dbs.forEach(db => {
         const isCurrent = db.dangLamViec;
         const card = document.createElement('div');
         card.className = `bg-white p-5 rounded-xl border transition shadow-sm relative flex flex-col justify-between ${isCurrent ? 'border-emerald-600 ring-1 ring-emerald-600 bg-emerald-50/10' : 'border-gray-200'}`;
-        
-        const tenCheDoMap = { 'TT152': 'Thông tư 152 (Hộ KD)', 'TT133': 'Thông tư 133 (DNNVV)', 'TT99': 'Thông tư 99 (Doanh nghiệp)' };
-        const tenGiaXuatMap = { 'BinhQuanCuoiKy': 'Bình quân cuối kỳ', 'GiaDichDanh': 'Giá đích danh', 'BinhQuanTucThoi': 'Bình quân tức thời', 'NhapTruocXuatTruoc': 'FIFO (Nhập trước xuất trước)' };
-        const tenThueMap = { 'KhauTru': 'Phương pháp khấu trừ', 'TrucTiep': 'Trực tiếp trên doanh thu' };
+
+        const tenCheDo = CHE_DO_KETOAN_MAP[db.cheDo]?.ngan || db.cheDo;
 
         card.innerHTML = `
             <div>
@@ -144,7 +180,7 @@ function renderDanhSachDatabase() {
                 <h4 class="font-bold text-gray-900 text-base mb-1">${db.ten}</h4>
                 <div class="space-y-1 text-xs text-gray-600 mt-2 border-t pt-2">
                     <p>Ngày tạo: <b class="text-gray-800">${db.ngayTao}</b></p>
-                    <p>Chế độ: <b class="text-orange-900">${tenCheDoMap[db.cheDo] || db.cheDo}</b></p>
+                    <p>Chế độ: <b class="text-orange-900">${tenCheDo}</b></p>
                     <p>Giá xuất kho: <b class="text-gray-800">${tenGiaXuatMap[db.phuongPhapGiaXuat] || 'Bình quân cuối kỳ'}</b></p>
                     <p>Thuế GTGT: <b class="text-gray-800">${tenThueMap[db.phuongPhapThueGTGT] || 'Phương pháp khấu trừ'}</b></p>
                 </div>
@@ -166,28 +202,25 @@ function renderDanhSachDatabase() {
 }
 
 async function chuyenKyLamViec(dbId) {
-    let dbs = layDanhSachDatabase();
-    let cheDoMoi = 'TT152';
-    dbs = dbs.map(db => {
-        if (db.id === dbId) {
-            cheDoMoi = db.cheDo || 'TT152';
-            return { ...db, dangLamViec: true };
-        }
-        return { ...db, dangLamViec: false };
-    });
+    const dbsHienTai = layDanhSachDatabase();
+    if (!dbsHienTai.some(db => db.id === dbId)) {
+        alert("Không tìm thấy cơ sở dữ liệu cần chuyển!");
+        return;
+    }
+
+    const dbsMoi = dbsHienTai.map(db => ({
+        ...db,
+        dangLamViec: db.id === dbId
+    }));
 
     try {
-        await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'databases', data: dbs })
-        });
-        window.serverCauHinhCache.databases = dbs;
-        localStorage.setItem('BIZMATE_CHEDO_KETOAN', cheDoMoi);
+        await guiLuuCauHinh('databases', dbsMoi);
+        window.serverCauHinhCache.databases = dbsMoi;
+        dongBoCheDoTuServer();
         renderDanhSachDatabase();
         alert("Đã chuyển đổi kỳ làm việc thành công!");
     } catch (e) {
-        alert("Lỗi kết nối khi chuyển kỳ làm việc!");
+        alert(e.message || "Lỗi kết nối khi chuyển kỳ làm việc!");
     }
 }
 
@@ -208,7 +241,7 @@ function moModalThemDuLieu(loai) {
     if (loai === 'namtruoc') {
         if (titleEl) titleEl.innerHTML = `<i class="fa-solid fa-file-arrow-down mr-2 text-emerald-400"></i> Thêm dữ liệu từ năm trước`;
         if (boxNamTruoc) boxNamTruoc.classList.remove('hidden');
-        
+
         if (selectNguon) {
             selectNguon.innerHTML = "";
             dbs.forEach(db => {
@@ -235,14 +268,14 @@ function dongModalThemDuLieu() {
 async function thucHienTaoDuLieuMoi() {
     const inputTen = document.getElementById('input-ten-dulieu');
     const tenDB = inputTen ? inputTen.value.trim().toUpperCase() : "";
-    
+
     if (!tenDB) {
         alert("Vui lòng nhập tên dữ liệu!");
         return;
     }
 
-    let dbs = layDanhSachDatabase();
-    const biTrung = dbs.some(db => db.ten.toUpperCase() === tenDB);
+    const dbsHienTai = layDanhSachDatabase();
+    const biTrung = dbsHienTai.some(db => db.ten.toUpperCase() === tenDB);
     if (biTrung) {
         alert(`Tên dữ liệu "${tenDB}" đã tồn tại trên hệ thống! Vui lòng đặt tên khác.`);
         if (inputTen) { inputTen.focus(); inputTen.select(); }
@@ -253,61 +286,52 @@ async function thucHienTaoDuLieuMoi() {
     const phuongPhapGiaXuat = document.querySelector('input[name="setup_giatrixuat"]:checked')?.value || 'BinhQuanCuoiKy';
     const phuongPhapThueGTGT = document.querySelector('input[name="setup_thuegtgt"]:checked')?.value || 'KhauTru';
     const ngayBatDau = document.getElementById('input-ngay-batdau')?.value || '2026-01-01';
+    const nguonDbId = loaiThemDuLieuHienTai === 'namtruoc'
+        ? (document.getElementById('select-nguon-nam-truoc')?.value || null)
+        : null;
 
-    const ngayTao = new Date().toLocaleDateString('vi-VN');
-    const newId = 'db_' + Date.now();
-
-    dbs.forEach(db => db.dangLamViec = false);
-    
     const dbMoi = {
-        id: newId,
+        id: 'db_' + Date.now(),
         ten: tenDB,
-        ngayTao: ngayTao,
-        cheDo: cheDo,
-        phuongPhapGiaXuat: phuongPhapGiaXuat,
-        phuongPhapThueGTGT: phuongPhapThueGTGT,
-        ngayBatDau: ngayBatDau,
+        ngayTao: new Date().toLocaleDateString('vi-VN'),
+        cheDo,
+        phuongPhapGiaXuat,
+        phuongPhapThueGTGT,
+        ngayBatDau,
+        nguonDbId,
         dangLamViec: true
     };
 
-    dbs.push(dbMoi);
+    const dbsMoi = dbsHienTai.map(db => ({ ...db, dangLamViec: false })).concat(dbMoi);
 
     try {
-        await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'databases', data: dbs })
-        });
-        window.serverCauHinhCache.databases = dbs;
-        localStorage.setItem('BIZMATE_CHEDO_KETOAN', cheDo);
-        
+        await guiLuuCauHinh('databases', dbsMoi);
+        window.serverCauHinhCache.databases = dbsMoi;
+        dongBoCheDoTuServer();
+
         dongModalThemDuLieu();
         renderDanhSachDatabase();
         alert(`Đã khởi tạo và chuyển sang làm việc với dữ liệu [${tenDB}] thành công!`);
     } catch (e) {
-        alert("Lỗi kết nối khi khởi tạo cơ sở dữ liệu mới!");
+        alert(e.message || "Lỗi kết nối khi khởi tạo cơ sở dữ liệu mới!");
     }
 }
 
 async function xoaCoSoDuLieu(dbId) {
-    let dbs = layDanhSachDatabase();
-    if (dbs.length <= 1) {
+    const dbsHienTai = layDanhSachDatabase();
+    if (dbsHienTai.length <= 1) {
         alert("Hệ thống bắt buộc phải duy trì ít nhất một cơ sở dữ liệu làm việc!");
         return;
     }
     if (!confirm("Bạn có chắc chắn muốn xóa cơ sở dữ liệu này không?")) return;
-    
-    dbs = dbs.filter(db => db.id !== dbId);
+
+    const dbsMoi = dbsHienTai.filter(db => db.id !== dbId);
     try {
-        await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'databases', data: dbs })
-        });
-        window.serverCauHinhCache.databases = dbs;
+        await guiLuuCauHinh('databases', dbsMoi);
+        window.serverCauHinhCache.databases = dbsMoi;
         renderDanhSachDatabase();
     } catch (e) {
-        alert("Lỗi kết nối khi xóa cơ sở dữ liệu!");
+        alert(e.message || "Lỗi kết nối khi xóa cơ sở dữ liệu!");
     }
 }
 
@@ -319,19 +343,14 @@ function napDuLieuCauHinhVaoForm() {
         if (el) el.value = val;
     };
 
-    const cheDoHienTai = localStorage.getItem('BIZMATE_CHEDO_KETOAN') || 'TT152';
-    const tenCheDoMap = {
-        'TT152': 'Thông tư số 152/TT-BTC (Hộ kinh doanh, cá nhân kinh doanh)',
-        'TT133': 'Thông tư số 133/2016/TT-BTC (Doanh nghiệp nhỏ và vừa)',
-        'TT99': 'Thông tư số 99/2025/TT-BTC (Doanh nghiệp lớn / Thay thế TT 200)'
-    };
+    const cheDoHienTai = dongBoCheDoTuServer();
 
-    setVal('config-chedo-ketoan', tenCheDoMap[cheDoHienTai] || cheDoHienTai);
+    setVal('config-chedo-ketoan', CHE_DO_KETOAN_MAP[cheDoHienTai]?.dayDu || cheDoHienTai);
     setVal('config-tendonvi', dataLocal.tenDonVi || 'CÔNG TY TNHH BIZMATE');
     setVal('config-mst', dataLocal.mst || '0200xxxxxx');
     setVal('config-diachi', dataLocal.diaChi || 'Lê Chân, Thành phố Hải Phòng');
     setVal('config-coquanthue', dataLocal.coQuanThue || '');
-    setVal('config-nguoilapphieu', dataLocal.nguoiLapPhiếu || '');
+    setVal('config-nguoilapphieu', dataLocal.nguoiLapPhieu || dataLocal.nguoiLapPhiếu || '');
     setVal('config-thukho', dataLocal.thuKho || '');
     setVal('config-ketoantruong', dataLocal.keToanTruong || '');
     setVal('config-giamdoc', dataLocal.giamDoc || '');
@@ -354,26 +373,19 @@ async function luuCauHinhHeThong() {
         mst,
         diaChi,
         coQuanThue: getVal('config-coquanthue'),
-        nguoiLapPhiếu: getVal('config-nguoilapphieu'),
+        nguoiLapPhieu: getVal('config-nguoilapphieu'),
         thuKho: getVal('config-thukho'),
         keToanTruong: getVal('config-ketoantruong'),
         giamDoc: getVal('config-giamdoc')
     };
 
     try {
-        const res = await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'doanhNghiep', data: cauHinhMoi })
-        });
-        const result = await res.json();
-        if (result.success) {
-            window.serverCauHinhCache.doanhNghiep = cauHinhMoi;
-            if (typeof napCauHinhDoanhNghiep === 'function') napCauHinhDoanhNghiep();
-            alert("Đã lưu thông tin đơn vị lên server thành công!");
-        }
+        await guiLuuCauHinh('doanhNghiep', cauHinhMoi);
+        window.serverCauHinhCache.doanhNghiep = cauHinhMoi;
+        if (typeof napCauHinhDoanhNghiep === 'function') napCauHinhDoanhNghiep();
+        alert("Đã lưu thông tin đơn vị lên server thành công!");
     } catch (e) {
-        alert("Lỗi kết nối khi lưu thông tin đơn vị!");
+        alert(e.message || "Lỗi kết nối khi lưu thông tin đơn vị!");
     }
 }
 
@@ -394,25 +406,18 @@ async function luuKiemSoatRuiRo() {
     const cauHinhRuiRo = {
         kiemTraAmTien: amtien,
         kiemTraAmKho: amkho,
-        maxTienMặt: maxTmVal,
+        maxTienMat: maxTmVal,
         kiemTraMaxTM: maxTmCheck,
-        ngayKhoaSo: ngayKhoaSo,
+        ngayKhoaSo,
         ngayBatDauHachToan: ngayBatDau
     };
 
     try {
-        const res = await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'ruiRo', data: cauHinhRuiRo })
-        });
-        const result = await res.json();
-        if (result.success) {
-            window.serverCauHinhCache.ruiRo = cauHinhRuiRo;
-            alert("Đã lưu thiết lập kiểm soát rủi ro lên server thành công!");
-        }
+        await guiLuuCauHinh('ruiRo', cauHinhRuiRo);
+        window.serverCauHinhCache.ruiRo = cauHinhRuiRo;
+        alert("Đã lưu thiết lập kiểm soát rủi ro lên server thành công!");
     } catch (e) {
-        alert("Lỗi kết nối khi lưu kiểm soát rủi ro!");
+        alert(e.message || "Lỗi kết nối khi lưu kiểm soát rủi ro!");
     }
 }
 
@@ -425,7 +430,8 @@ function napKiemSoatRuiRo() {
     if (radAmKho) radAmKho.checked = true;
 
     if (document.getElementById('opt-max-tienmat')) {
-        document.getElementById('opt-max-tienmat').value = Number(data.maxTienMặt || 5000000).toLocaleString('en-US');
+        const maxTm = data.maxTienMat ?? data.maxTienMặt ?? 5000000;
+        document.getElementById('opt-max-tienmat').value = Number(maxTm).toLocaleString('en-US');
     }
     const radMaxTM = document.querySelector(`input[name="opt_kiemtra_max_tm"][value="${data.kiemTraMaxTM || '0'}"]`);
     if (radMaxTM) radMaxTM.checked = true;
@@ -444,18 +450,11 @@ async function luuTuyChonThaoTacNhanh() {
     };
 
     try {
-        const res = await fetch('/api/cau-hinh/luu', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ loai: 'thaoTacNhanh', data: cauHinhNhanh })
-        });
-        const result = await res.json();
-        if (result.success) {
-            window.serverCauHinhCache.thaoTacNhanh = cauHinhNhanh;
-            alert("Đã lưu tùy chọn thao tác nhanh lên server thành công!");
-        }
+        await guiLuuCauHinh('thaoTacNhanh', cauHinhNhanh);
+        window.serverCauHinhCache.thaoTacNhanh = cauHinhNhanh;
+        alert("Đã lưu tùy chọn thao tác nhanh lên server thành công!");
     } catch (e) {
-        alert("Lỗi kết nối khi lưu thao tác nhanh!");
+        alert(e.message || "Lỗi kết nối khi lưu thao tác nhanh!");
     }
 }
 
